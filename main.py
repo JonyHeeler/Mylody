@@ -10,7 +10,8 @@ import uvicorn
 from mylody.config import Config
 from mylody.logger import setup_logger
 from mylody.server.app import create_app
-from mylody.listener.media_session import MediaSessionManager
+from mylody.listener import MediaListener
+from mylody.types import MediaInfo
 
 
 def parse_args() -> argparse.Namespace:
@@ -21,18 +22,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def start_listener(app, media_mgr: MediaSessionManager, poll_interval: int) -> None:
+def start_listener(app, listener: MediaListener) -> None:
     """在后台线程启动媒体监听"""
-    async def poll_loop():
-        await media_mgr.initialize()
-        while True:
-            info = await media_mgr.get_current_info()
-            app.state.current_track = info.to_dict() if info else None
-            await asyncio.sleep(poll_interval)
-
     def run():
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(poll_loop())
+        loop.run_until_complete(listener.start())
+        loop.run_forever()
 
     thread = threading.Thread(target=run, daemon=True)
     thread.start()
@@ -53,12 +48,32 @@ def main() -> None:
     for w in warnings:
         logger.warning(w)
 
+    from mylody.ai import AIClient
+
+    ai_client = AIClient(config)
+
     app = create_app()
     app.state.config = config
+    app.state.ai_client = ai_client
+    app.state.current_review = None
+    app.state.current_track_info = None
 
-    media_mgr = MediaSessionManager()
-    poll_interval = config.get("listener.poll_interval_seconds", 2)
-    start_listener(app, media_mgr, poll_interval)
+    async def on_track_change(info: MediaInfo) -> None:
+        """曲目变化时的回调：更新状态并生成乐评"""
+        app.state.current_track = info.to_dict()
+        app.state.current_track_info = info
+        logger.info("🎵 正在播放: %s - %s", info.title, info.artist)
+
+        review = await ai_client.generate_review(info)
+        if review:
+            app.state.current_review = review
+            logger.info("✅ 乐评生成成功: %s", review.summary)
+        else:
+            app.state.current_review = None
+            logger.warning("⚠️ 乐评生成失败")
+
+    listener = MediaListener(config, on_track_change)
+    start_listener(app, listener)
 
     port = args.port or config.get("server.port", 5800)
     host = config.get("server.host", "127.0.0.1")
