@@ -43,12 +43,12 @@ class ReviewData:
     """AI 乐评数据结构
 
     Attributes:
-        summary: 一句话概括（30字以内）
-        emotion: 情感基调
-        background: 创作背景或艺术家简介
-        musicology: 音乐理论简析
-        why_listen: 推荐理由
-        similar_songs: 相似歌曲列表
+        summary: 有画面感或情绪感的短句概括（30字以内）
+        emotion: 核心情绪关键词，如迷恋、怀旧、孤独、成长等
+        background: 发行背景、专辑位置、创作语境（200字以内）
+        musicology: 制作和声音分析（200字以内）
+        why_listen: 与听众生活经验的连接（150字以内）
+        similar_songs: 相似歌曲列表（3首）
         rating: 评分（0-10）
     """
     summary: str = ""

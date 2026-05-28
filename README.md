@@ -1,50 +1,54 @@
 # Mylody
 
-Windows 桌面音乐乐评工具 — 自动识别当前播放的音乐，调用 AI 生成结构化乐评。
+Windows 桌面音乐乐评工具 — 自动识别当前播放的音乐，调用 AI 生成专业乐评。
+本项目灵感来源为 iOS 应用 Melory，下载地址：https://apps.apple.com/cn/app/id6756657818。
+本项目为 2025-2026-2 学期《AI 智能体产品设计》课程第 13 周作业。
+如有建议。欢迎给我发邮件。我的联系方式在主页。
 
 ## 功能
 
-- **自动监听**：通过 Windows SMTC API 读取当前播放的歌曲信息
-- **AI 乐评**：调用 Claude / OpenAI 生成专业乐评
-- **本地缓存**：SQLite 存储，同一首歌不重复请求
+- **自动监听**：通过 Windows SMTC API 读取当前播放的歌曲信息（支持 Spotify、网易云、Apple Music 等）
+- **AI 乐评**：调用 Claude / OpenAI 生成专业中文乐评，包含情感分析、乐理解析、创作背景等
+- **本地缓存**：SQLite 存储，同一首歌只请求一次 AI，后续直接读取缓存
 - **Web 界面**：浏览器打开 `http://localhost:5800` 查看乐评
 
-## 项目结构
+## 环境要求
 
-```
-mylody/          # 后端（Python + FastAPI）
-├── config.py        配置管理
-├── listener/        Windows 媒体会话监听
-├── server/          FastAPI 路由
-├── ai_client.py     AI 请求
-├── cache.py         缓存管理
-└── utils/           工具函数
+| 依赖 | 版本要求 | 说明 |
+|---|---|---|
+| Windows | 10/11 | 需要 Windows Media Control API 支持 |
+| Python | 3.11+ | 推荐 3.11，兼容 3.12/3.13 |
+| 网络 | 需要 | 调用 AI API 需要网络连接 |
 
-web/             # 前端（HTML + CSS + JS）
-├── index.html
-├── style.css
-└── app.js
-```
+> **注意**：本项目依赖 `winsdk` 库，仅支持 Windows 系统。
 
 ## 快速开始
 
-### 1. 安装依赖
+### 1. 创建虚拟环境
+
+```bash
+py -3.11 -m venv .venv
+.venv\Scripts\activate
+```
+
+### 2. 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. 配置 API Key
+### 3. 配置 API Key
 
 首次运行会自动生成 `~/.mylody/config.yaml`，编辑填写你的 API Key：
 
 ```yaml
 ai:
-  provider: "anthropic"
-  api_key: "sk-ant-xxxxx"
+  provider: "anthropic"    # 可选: anthropic | openai | custom
+  api_key: "sk-ant-xxxxx"  # ← 填写你的 API Key
+  model: "claude-sonnet-4-20250514"
 ```
 
-### 3. 启动
+### 4. 启动
 
 ```bash
 python main.py
@@ -65,15 +69,45 @@ python main.py --config ./my.yaml   # 指定配置文件
 |---|---|---|
 | Anthropic | `anthropic` | 默认，Claude 系列 |
 | OpenAI | `openai` | GPT 系列 |
-| 自定义 | `custom` | 兼容 OpenAI 格式的接口 |
+| 自定义 | `custom` | 兼容 OpenAI 格式的接口（如 DeepSeek、通义千问） |
 
-## 开发规范
+## 项目结构
 
-- 单文件 ≤ 200 行
-- 模块化，极限解耦
-- 所有导出函数必须有 docstring
-- 前后端完全分离
+```
+mylody/              # 后端（Python + FastAPI）
+├── ai/              AI 请求模块（Prompt + Provider）
+├── cache/           SQLite 缓存管理
+├── listener/        Windows 媒体会话监听
+├── server/          FastAPI 路由
+└── utils/           工具函数
 
-## License
+web/                 # 前端（HTML + CSS + JS）
+├── index.html
+├── style.css
+└── app.js
+```
 
-MIT
+## 配置说明
+
+配置文件位于 `~/.mylody/config.yaml`，主要配置项：
+
+```yaml
+ai:
+  provider: "anthropic"
+  api_key: "YOUR_API_KEY"
+  model: "claude-sonnet-4-20250514"
+  timeout_seconds: 15
+
+listener:
+  poll_interval_seconds: 2   # 检测频率
+  debounce_seconds: 3        # 防抖时间
+  excluded_apps: []          # 排除的应用
+
+cache:
+  enabled: true
+  cache_ttl_days: 0          # 0 = 永不过期
+
+server:
+  host: "127.0.0.1"
+  port: 5800
+```
