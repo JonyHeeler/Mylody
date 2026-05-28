@@ -120,6 +120,6 @@ server:
 ### 2026-05-28 周四
 今天的工作是完成项目脚手架搭建，构建最小可行产品。目前的问题是界面太丑、功能太少，AI 幻觉太严重，主要是乐理分析的部分，全是瞎编的。明天重点优化这些方面。
 
-![Mylody 当前状态](img/show-05-28.png)
+![Mylody 当前状态](img/show-5-28.png)
 
 <sub>今天在听 Matilda by Harry Styles</sub>
