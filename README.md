@@ -2,7 +2,7 @@
 
 音乐乐评 AI Agent — 自动识别当前播放的音乐，调用 AI 生成专业乐评。
 
-本项目灵感来源为 iOS 应用 Melory，下载地址：https://apps.apple.com/cn/app/id6756657818。
+本项目灵感来源为 iOS 应用 Melory，下载地址：https://apps.apple.com/cn/app/id6756657818
 
 本项目为 2025-2026-2 学期《AI 智能体产品设计》课程第 13 周作业。
 
