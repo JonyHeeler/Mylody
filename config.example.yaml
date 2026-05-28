@@ -1,0 +1,44 @@
+# =============================================
+#  Mylody 配置文件示例
+#  1. 将此文件复制为 ~/.mylody/config.yaml
+#  2. 按注释填写你的配置
+#  3. 切勿将 config.yaml 上传至 Git 或分享给他人
+# =============================================
+
+# --- AI 接口配置 ---
+ai:
+  provider: "anthropic"          # 可选: anthropic | openai | custom
+  api_key: "YOUR_API_KEY_HERE"   # ← 填写你的 API Key
+  model: "claude-sonnet-4-20250514"  # 使用的模型名称
+  base_url: ""                   # 仅 custom provider 需要填写
+  timeout_seconds: 15            # 请求超时时间
+  max_retries: 2                 # 失败自动重试次数
+
+# --- 缓存配置 ---
+cache:
+  enabled: true
+  cache_ttl_days: 0              # 0 = 永不过期；设置正整数则按天过期
+  db_path: ""                    # 留空则使用默认路径
+
+# --- 音乐监听配置 ---
+listener:
+  poll_interval_seconds: 2       # 检测当前播放歌曲的频率
+  debounce_seconds: 3            # 歌曲稳定播放多少秒后触发乐评
+  excluded_apps: []              # 排除的应用进程名
+
+# --- 展示配置 ---
+display:
+  show_in_tray: true             # 是否在系统托盘显示图标
+  auto_show_review: true         # 检测到新歌时是否自动弹出乐评
+  language: "zh-CN"              # 乐评语言: zh-CN | en-US | ja-JP
+
+# --- 日志配置 ---
+logging:
+  level: "INFO"                  # DEBUG | INFO | WARNING | ERROR
+  max_file_size_mb: 5
+  backup_count: 3
+
+# --- 服务配置 ---
+server:
+  host: "127.0.0.1"
+  port: 5800

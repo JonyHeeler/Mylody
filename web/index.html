@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mylody</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">🎵 Mylody</h1>
+            <span class="status-dot" id="statusDot"></span>
+        </header>
+
+        <main>
+            <div class="track-card" id="trackCard">
+                <div class="track-info">
+                    <div class="track-title" id="trackTitle">等待播放...</div>
+                    <div class="track-artist" id="trackArtist"></div>
+                    <div class="track-album" id="trackAlbum"></div>
+                </div>
+                <div class="track-status" id="trackStatus">监听中</div>
+            </div>
+
+            <div class="review-card" id="reviewCard">
+                <div class="review-placeholder">
+                    <span class="review-icon">📝</span>
+                    <p>乐评将在 Phase 2 实现</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <span id="uptime">运行时间: --</span>
+            <span id="sourceApp">来源: --</span>
+        </footer>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

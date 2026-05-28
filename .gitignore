@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Mylody 配置（包含 API Key，不上传）
+~/.mylody/
+*.yaml
+!config.example.yaml
+
+# 日志
+*.log
+logs/
+
+# 缓存
+*.db
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (if frontend evolves)
+node_modules/
+package-lock.json
+
+# Trae
+.trae/
