@@ -1,0 +1,45 @@
+:root {
+    --bg-primary: #fdfbfb;
+    --bg-card: rgba(255, 255, 255, 0.62);
+    --bg-card-hover: rgba(255, 255, 255, 0.78);
+    --bg-modal: rgba(255, 255, 255, 0.95);
+    --bg-overlay: rgba(0, 0, 0, 0.3);
+
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --text-muted: #aeaeb2;
+
+    --accent: #0071e3;
+    --accent-hover: #0077ED;
+    --accent-dim: rgba(0, 113, 227, 0.1);
+
+    --aurora-1: #fdfbfb;
+    --aurora-2: #d7b4ff;
+    --aurora-3: #72b7ff;
+    --aurora-4: #a7e3ff;
+    --aurora-5: #ccfaeb;
+    --aurora-6: #ffb0e7;
+    --aurora-7: #ffe0ad;
+    --aurora-8: #ffb9aa;
+
+    --glow-blue: rgba(114, 183, 255, 0.62);
+    --glow-violet: rgba(215, 180, 255, 0.52);
+    --glow-warm: rgba(255, 224, 173, 0.58);
+
+    --score-high: #34c759;
+    --score-mid: #ff9f0a;
+    --score-low: #ff3b30;
+
+    --border: rgba(0, 0, 0, 0.06);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-pill: 980px;
+
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.06);
+    --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.12);
+    --shadow-toast: 0 4px 24px rgba(0, 0, 0, 0.1);
+
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}

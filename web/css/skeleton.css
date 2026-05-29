@@ -1,0 +1,54 @@
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease infinite;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.skeleton-text:last-child {
+    width: 60%;
+}
+
+.skeleton-title {
+    height: 22px;
+    width: 70%;
+    margin-bottom: 12px;
+}
+
+.skeleton-score {
+    height: 48px;
+    width: 60px;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-tag {
+    height: 28px;
+    width: 80px;
+    border-radius: var(--radius-pill);
+}
+
+.skeleton-block {
+    height: 100px;
+    width: 100%;
+}
+
+.skeleton-group {
+    margin-bottom: 20px;
+}
+
+.skeleton-group-label {
+    height: 13px;
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

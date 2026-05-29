@@ -1,0 +1,121 @@
+.aurora {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--bg-primary);
+    transition: background-color 0.8s ease, filter 0.8s ease;
+    overflow: hidden;
+}
+
+.aurora--active {
+    background: linear-gradient(
+        -45deg,
+        var(--aurora-1),
+        var(--aurora-2),
+        var(--aurora-3),
+        var(--aurora-4),
+        var(--aurora-5),
+        var(--aurora-6),
+        var(--aurora-7),
+        var(--aurora-8),
+        var(--aurora-1)
+    );
+    background-size: 800% 800%;
+    animation: auroraFlow 18s ease infinite;
+    filter: saturate(1.08) contrast(1.02);
+}
+
+.aurora--frozen {
+    background: linear-gradient(
+        -45deg,
+        var(--aurora-1),
+        var(--aurora-2),
+        var(--aurora-3),
+        var(--aurora-4),
+        var(--aurora-5),
+        var(--aurora-6),
+        var(--aurora-7),
+        var(--aurora-8),
+        var(--aurora-1)
+    );
+    background-size: 800% 800%;
+    filter: saturate(1.08) contrast(1.02);
+}
+
+.aurora-glow {
+    position: absolute;
+    border-radius: 50%;
+    mix-blend-mode: multiply;
+    filter: blur(78px);
+    opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.aurora-glow--blue {
+    width: max(520px, 58vw);
+    height: max(520px, 58vw);
+    background: var(--glow-blue);
+    top: -22%;
+    left: -18%;
+}
+
+.aurora-glow--violet {
+    width: max(420px, 46vw);
+    height: max(420px, 46vw);
+    background: var(--glow-violet);
+    top: 8%;
+    right: -18%;
+}
+
+.aurora-glow--warm {
+    width: max(560px, 64vw);
+    height: max(560px, 64vw);
+    background: var(--glow-warm);
+    bottom: -28%;
+    right: -16%;
+}
+
+.aurora--active .aurora-glow {
+    opacity: 0.95;
+    animation: glowFloatBlue 16s infinite alternate ease-in-out;
+}
+
+.aurora--active .aurora-glow--violet {
+    animation-name: glowFloatViolet;
+    animation-delay: -4s;
+}
+
+.aurora--active .aurora-glow--warm {
+    animation-name: glowFloatWarm;
+    animation-delay: -7s;
+}
+
+.aurora--frozen .aurora-glow {
+    opacity: 0.88;
+}
+
+@keyframes auroraFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes glowFloatBlue {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    45% { transform: translate3d(16vw, 8vh, 0) scale(1.14); }
+    100% { transform: translate3d(7vw, 24vh, 0) scale(0.96); }
+}
+
+@keyframes glowFloatViolet {
+    0% { transform: translate3d(0, 0, 0) scale(0.96); }
+    50% { transform: translate3d(-18vw, 18vh, 0) scale(1.12); }
+    100% { transform: translate3d(-8vw, -6vh, 0) scale(1.04); }
+}
+
+@keyframes glowFloatWarm {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(-20vw, -18vh, 0) scale(1.1); }
+    100% { transform: translate3d(-6vw, 4vh, 0) scale(0.94); }
+}

@@ -67,6 +67,7 @@ def main() -> None:
     app.state.cache_manager = cache_manager
     app.state.current_review = None
     app.state.current_track_info = None
+    app.state.is_generating = False
 
     async def on_track_change(info: MediaInfo) -> None:
         """曲目变化时的回调：先查缓存，未命中再调用 AI"""
@@ -77,20 +78,25 @@ def main() -> None:
         cached = cache_manager.get(info.artist, info.title)
         if cached:
             app.state.current_review = cached
+            app.state.is_generating = False
             logger.info("✅ 缓存命中，直接使用: %s", cached.summary)
             return
 
-        review = await ai_client.generate_review(info)
-        if review:
-            app.state.current_review = review
-            cache_manager.put(
-                info.artist, info.title, info.album, review,
-                model=config.get("ai.model", ""),
-            )
-            logger.info("✅ 乐评生成成功: %s", review.summary)
-        else:
-            app.state.current_review = None
-            logger.warning("⚠️ 乐评生成失败")
+        app.state.is_generating = True
+        try:
+            review = await ai_client.generate_review(info)
+            if review:
+                app.state.current_review = review
+                cache_manager.put(
+                    info.artist, info.title, info.album, review,
+                    model=config.get("ai.model", ""),
+                )
+                logger.info("✅ 乐评生成成功: %s", review.summary)
+            else:
+                app.state.current_review = None
+                logger.warning("⚠️ 乐评生成失败")
+        finally:
+            app.state.is_generating = False
 
     listener = MediaListener(config, on_track_change)
     start_listener(app, listener)

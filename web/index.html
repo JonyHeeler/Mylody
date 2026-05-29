@@ -4,12 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mylody</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/css/variables.css?v=aurora2">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/aurora.css?v=aurora2">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/track-card.css">
+    <link rel="stylesheet" href="/css/review-card.css">
+    <link rel="stylesheet" href="/css/skeleton.css">
+    <link rel="stylesheet" href="/css/buttons.css">
+    <link rel="stylesheet" href="/css/toast.css">
+    <link rel="stylesheet" href="/css/modal.css">
+    <link rel="stylesheet" href="/css/responsive.css">
 </head>
 <body>
-    <div class="container">
+    <div class="aurora" id="auroraBg">
+        <div class="aurora-glow aurora-glow--blue"></div>
+        <div class="aurora-glow aurora-glow--violet"></div>
+        <div class="aurora-glow aurora-glow--warm"></div>
+    </div>
+
+    <div class="app-container">
         <header class="header">
-            <h1 class="logo">🎵 Mylody</h1>
+            <div class="logo">
+                <span class="logo-icon">🎵</span>
+                <span>Mylody</span>
+            </div>
             <div class="header-actions">
                 <button class="btn-icon" id="settingsBtn" title="设置">⚙️</button>
                 <span class="status-dot" id="statusDot"></span>
@@ -99,11 +119,18 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" id="cancelSettingsBtn">取消</button>
-                <button class="btn-primary" id="saveSettingsBtn">保存</button>
+                <button class="btn-apple" id="saveSettingsBtn">保存</button>
             </div>
         </div>
     </div>
 
-    <script src="/app.js"></script>
+    <script src="/js/state.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/aurora.js?v=aurora2"></script>
+    <script src="/js/display.js?v=trackfix1"></script>
+    <script src="/js/skeleton.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/modal.js"></script>
+    <script src="/js/app.js?v=aurora2"></script>
 </body>
 </html>

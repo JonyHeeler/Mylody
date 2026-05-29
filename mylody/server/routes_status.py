@@ -21,4 +21,5 @@ async def get_status(request: Request) -> dict:
         "running": True,
         "current_track": current_track,
         "uptime_seconds": round(time.time() - start_time, 1),
+        "is_generating": getattr(request.app.state, "is_generating", False),
     }
