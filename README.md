@@ -127,6 +127,6 @@ server:
 ### 2026-05-29 周五
 今天在忙别的项目，原本的计划是今天做 AI 反幻觉，但是实际上是做了前端优化。给项目加了极光效果，灵感来自我之前的个人网站。初步确立了反幻觉技术路线。实操放在周末。
 
-![Mylody 当前状态](img/show-5-29.gif)
+![Mylody 当前状态](img/show-5-29.png)
 
 <sub>今天在听 the Saltwater Room by Owl City</sub>
