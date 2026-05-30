@@ -129,4 +129,7 @@ server:
 
 ![Mylody 当前状态](img/show-5-29.png)
 
-<sub>今天在听 the Saltwater Room by Owl City</sub>
+  <sub>今天在听 the Saltwater Room by Owl City</sub>
+
+### 2026-05-30 周六
+今天把项目改崩了，一条乐评都出不来了。fuck
