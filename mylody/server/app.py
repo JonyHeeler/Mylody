@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from mylody.server.routes_status import router as status_router
 from mylody.server.routes_review import router as review_router
 from mylody.server.routes_config import router as config_router
+from mylody.server.routes_logs import router as logs_router
 
 
 def create_app() -> FastAPI:
@@ -25,10 +26,12 @@ def create_app() -> FastAPI:
 
     app.state.start_time = time.time()
     app.state.current_track = None
+    app.state.status_events = []
 
     app.include_router(status_router)
     app.include_router(review_router)
     app.include_router(config_router)
+    app.include_router(logs_router)
 
     web_dir = Path(__file__).parent.parent.parent / "web"
     if web_dir.exists():

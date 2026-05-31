@@ -11,7 +11,7 @@
 ## 功能
 
 - **自动监听**：通过 Windows SMTC API 读取当前播放的歌曲信息（支持 Spotify、网易云、Apple Music 等）
-- **AI 乐评**：调用 Claude / OpenAI 生成专业中文乐评，包含情感分析、乐理解析、创作背景等
+- **AI 乐评**：调用小米 Mimo 生成专业中文乐评，包含情感分析、乐理解析、创作背景等
 - **本地缓存**：SQLite 存储，同一首歌只请求一次 AI，后续直接读取缓存
 - **Web 界面**：浏览器打开 `http://localhost:5800` 查看乐评
 
@@ -46,9 +46,9 @@ pip install -r requirements.txt
 
 ```yaml
 ai:
-  provider: "anthropic"    # 可选: anthropic | openai | custom
-  api_key: "sk-ant-xxxxx"  # ← 填写你的 API Key
-  model: "claude-sonnet-4-20250514"
+  provider: "mimo"          # 目前仅支持小米 Mimo
+  api_key: "YOUR_API_KEY"   # ← 填写你的 Mimo API Key
+  model: "mimo-v2.5-pro"    # 默认模型
 ```
 
 ### 4. 启动
@@ -68,11 +68,11 @@ python main.py --config ./my.yaml   # 指定配置文件
 
 ## 支持的 AI 提供商
 
-| 提供商 | 配置值 | 说明 |
-|---|---|---|
-| Anthropic | `anthropic` | 默认，Claude 系列 |
-| OpenAI | `openai` | GPT 系列 |
-| 自定义 | `custom` | 兼容 OpenAI 格式的接口（如 DeepSeek、通义千问） |
+目前仅支持**小米 Mimo**，配置值为 `mimo`。
+
+- 默认模型：`mimo-v2.5-pro`
+- 接口地址：`https://api.xiaomimimo.com/v1`
+- 支持联网搜索功能，可自动补充音乐背景信息
 
 ## 项目结构
 
@@ -96,9 +96,9 @@ web/                 # 前端（HTML + CSS + JS）
 
 ```yaml
 ai:
-  provider: "anthropic"
-  api_key: "YOUR_API_KEY"
-  model: "claude-sonnet-4-20250514"
+  provider: "mimo"          # 目前仅支持小米 Mimo
+  api_key: "YOUR_API_KEY"   # Mimo API Key
+  model: "mimo-v2.5-pro"    # 默认模型
   timeout_seconds: 15
 
 listener:

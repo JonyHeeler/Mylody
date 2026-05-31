@@ -7,11 +7,10 @@
 
 # --- AI 接口配置 ---
 ai:
-  provider: "anthropic"          # 可选: anthropic | openai | custom
-  api_key: "YOUR_API_KEY_HERE"   # ← 填写你的 API Key
-  model: "claude-sonnet-4-20250514"  # 使用的模型名称
-  base_url: ""                   # 仅 custom provider 需要填写
-  timeout_seconds: 15            # 请求超时时间
+  api_key: "YOUR_API_KEY_HERE"   # 填写你的 API Key
+  model: "deepseek-chat"         # 使用的模型名称，例如 deepseek-chat / gpt-4o-mini / mimo-v2.5-flash
+  base_url: "https://api.deepseek.com"  # OpenAI-compatible API 地址
+  timeout_seconds: 30            # 请求超时时间
   max_retries: 2                 # 失败自动重试次数
 
 # --- 缓存配置 ---

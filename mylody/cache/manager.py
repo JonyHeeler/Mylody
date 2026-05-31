@@ -3,13 +3,17 @@
 import json
 import logging
 from datetime import datetime, timedelta
+from dataclasses import fields
 from typing import Optional
 
 from mylody.cache.db import Database
 from mylody.cache.key import normalize_cache_key
+from mylody.ai.guardrails import normalize_review_payload
 from mylody.types import ReviewData
 
 logger = logging.getLogger("mylody.cache.manager")
+
+CURRENT_SCHEMA_VERSION = "review_v2"
 
 
 class CacheManager:
@@ -55,10 +59,10 @@ class CacheManager:
 
         if self._is_expired(updated_at):
             logger.debug("缓存已过期: %s", cache_key)
-            self._db.conn.execute(
-                "DELETE FROM reviews WHERE cache_key = ?", (cache_key,)
-            )
-            self._db.conn.commit()
+            self._delete_cache_key(cache_key)
+            return None
+
+        if not self._check_schema_version(review_json, cache_key):
             return None
 
         logger.info("缓存命中: %s", cache_key)
@@ -130,6 +134,66 @@ class CacheManager:
             logger.error("缓存删除失败: %s - %s", cache_key, e)
             return False
 
+    def list_reviews(self, limit: int = 200) -> list[dict]:
+        """列出已缓存乐评摘要，按更新时间倒序。"""
+        try:
+            rows = self._db.conn.execute(
+                """SELECT cache_key, title, artist, album, review_json, ai_model, created_at, updated_at
+                   FROM reviews
+                   ORDER BY updated_at DESC
+                   LIMIT ?""",
+                (limit,),
+            ).fetchall()
+        except Exception as e:
+            logger.error("缓存列表读取失败: %s", e)
+            return []
+
+        items = []
+        for row in rows:
+            cache_key, title, artist, album, review_json, model, created_at, updated_at = row
+            review = self._deserialize_review(review_json)
+            fallback = self._extract_review_summary(review_json)
+            items.append({
+                "cache_key": cache_key,
+                "title": title,
+                "artist": artist or "",
+                "album": album or "",
+                "model": model or "",
+                "created_at": created_at,
+                "updated_at": updated_at,
+                "rating": review.rating if review else fallback.get("rating"),
+                "emotion": review.emotion if review else fallback.get("emotion", ""),
+                "excerpt": (review.content[:120] if review else fallback.get("excerpt", "")),
+            })
+        return items
+
+    def delete_by_key(self, cache_key: str) -> bool:
+        """按缓存键删除乐评。"""
+        try:
+            cursor = self._db.conn.execute(
+                "DELETE FROM reviews WHERE cache_key = ?", (cache_key,)
+            )
+            self._db.conn.commit()
+            deleted = cursor.rowcount > 0
+            if deleted:
+                logger.info("缓存已删除: %s", cache_key)
+            return deleted
+        except Exception as e:
+            logger.error("缓存删除失败: %s - %s", cache_key, e)
+            return False
+
+    def clear(self) -> int:
+        """清空全部缓存，返回删除条数。"""
+        try:
+            cursor = self._db.conn.execute("DELETE FROM reviews")
+            self._db.conn.commit()
+            deleted = cursor.rowcount if cursor.rowcount >= 0 else 0
+            logger.info("缓存已清空: %d 条", deleted)
+            return deleted
+        except Exception as e:
+            logger.error("清空缓存失败: %s", e)
+            return 0
+
     def stats(self) -> dict:
         """获取缓存统计信息
 
@@ -172,6 +236,55 @@ class CacheManager:
         except (ValueError, TypeError):
             return False
 
+    def _check_schema_version(self, review_json: str, cache_key: str) -> bool:
+        """检查缓存的 schema 版本是否匹配
+
+        Args:
+            review_json: 缓存的 JSON 字符串
+            cache_key: 缓存键
+
+        Returns:
+            bool: 版本匹配返回 True
+        """
+        try:
+            data = json.loads(review_json)
+            version = data.get("schema_version")
+        except (json.JSONDecodeError, TypeError):
+            logger.warning("缓存 JSON 解析失败，视为版本不匹配: %s", cache_key)
+            self._delete_cache_key(cache_key)
+            return False
+
+        if version != CURRENT_SCHEMA_VERSION:
+            normalized = normalize_review_payload(data)
+            if normalized.get("schema_version") == CURRENT_SCHEMA_VERSION:
+                logger.info("旧版缓存可兼容读取: %s", cache_key)
+                return True
+
+            logger.info(
+                "缓存 schema 版本不匹配 (缓存: %s, 当前: %s): %s",
+                version,
+                CURRENT_SCHEMA_VERSION,
+                cache_key,
+            )
+            self._delete_cache_key(cache_key)
+            return False
+
+        return True
+
+    def _delete_cache_key(self, cache_key: str) -> None:
+        """删除指定缓存键
+
+        Args:
+            cache_key: 缓存键
+        """
+        try:
+            self._db.conn.execute(
+                "DELETE FROM reviews WHERE cache_key = ?", (cache_key,)
+            )
+            self._db.conn.commit()
+        except Exception as e:
+            logger.error("删除缓存失败: %s - %s", cache_key, e)
+
     @staticmethod
     def _deserialize_review(review_json: str) -> Optional[ReviewData]:
         """反序列化乐评 JSON
@@ -184,7 +297,34 @@ class CacheManager:
         """
         try:
             data = json.loads(review_json)
-            return ReviewData(**data)
+            data = normalize_review_payload(data)
+            valid_fields = {f.name for f in fields(ReviewData)}
+            filtered = {k: v for k, v in data.items() if k in valid_fields}
+            return ReviewData(**filtered)
         except (json.JSONDecodeError, TypeError) as e:
             logger.error("缓存数据反序列化失败: %s", e)
             return None
+
+    @staticmethod
+    def _extract_review_summary(review_json: str) -> dict:
+        """Best-effort summary extraction for legacy cache rows."""
+        try:
+            data = json.loads(review_json)
+            data = normalize_review_payload(data)
+        except (json.JSONDecodeError, TypeError):
+            return {}
+
+        content = data.get("content") or data.get("summary") or ""
+        if not content:
+            parts = [
+                data.get("background", ""),
+                data.get("musicology", ""),
+                data.get("why_listen", ""),
+            ]
+            content = " ".join(part for part in parts if isinstance(part, str))
+
+        return {
+            "rating": data.get("rating"),
+            "emotion": data.get("emotion", ""),
+            "excerpt": content[:120] if isinstance(content, str) else "",
+        }

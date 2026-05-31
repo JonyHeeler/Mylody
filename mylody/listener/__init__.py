@@ -1,6 +1,7 @@
 """音乐监听模块：监听 Windows 当前播放的媒体信息"""
 
 import asyncio
+import inspect
 import logging
 from typing import Callable, Optional
 
@@ -20,9 +21,15 @@ class MediaListener:
         on_track_change: 曲目变化时的回调函数
     """
 
-    def __init__(self, config: Config, on_track_change: Callable) -> None:
+    def __init__(
+        self,
+        config: Config,
+        on_track_change: Callable,
+        on_track_clear: Optional[Callable] = None,
+    ) -> None:
         self._config = config
         self._on_track_change = on_track_change
+        self._on_track_clear = on_track_clear
         self._media_session = MediaSessionManager()
         self._debouncer = Debouncer(
             delay_seconds=config.get("listener.debounce_seconds", 3),
@@ -77,10 +84,13 @@ class MediaListener:
             try:
                 info = await self._media_session.get_current_info()
 
-                if info is None:
+                if info is None or not info.is_playable_track():
                     if self._current_track is not None:
                         logger.debug("媒体播放已停止")
                         self._current_track = None
+                        self._pending_track = None
+                        self._debouncer.cancel()
+                        await self._notify_track_clear()
                     await asyncio.sleep(poll_interval)
                     continue
 
@@ -145,6 +155,15 @@ class MediaListener:
             await self._on_track_change(info)
         except Exception as e:
             logger.error("曲目变化回调执行失败: %s", e)
+
+    async def _notify_track_clear(self) -> None:
+        """通知上层当前没有有效播放曲目"""
+        if self._on_track_clear is None:
+            return
+
+        result = self._on_track_clear()
+        if inspect.isawaitable(result):
+            await result
 
 
 __all__ = ["MediaSessionManager", "Debouncer", "MediaListener"]

@@ -16,7 +16,6 @@ class BaseProvider(ABC):
         Args:
             system: 系统 Prompt
             user: 用户 Prompt
-
         Returns:
             str: AI 返回的原始文本响应
 

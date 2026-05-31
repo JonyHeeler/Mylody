@@ -52,26 +52,12 @@
                     <p>等待乐评生成...</p>
                 </div>
                 <div class="review-content" id="reviewContent" style="display: none;">
+                    <div class="review-quote" id="reviewQuote"></div>
                     <div class="review-header">
                         <div class="review-score" id="reviewScore">--</div>
                         <div class="review-emotion" id="reviewEmotion"></div>
                     </div>
-                    <div class="review-section">
-                        <div class="review-label">📝 概述</div>
-                        <div class="review-text" id="reviewSummary"></div>
-                    </div>
-                    <div class="review-section">
-                        <div class="review-label">🎹 乐理分析</div>
-                        <div class="review-text" id="reviewTheory"></div>
-                    </div>
-                    <div class="review-section">
-                        <div class="review-label">📖 背景</div>
-                        <div class="review-text" id="reviewBackground"></div>
-                    </div>
-                    <div class="review-section">
-                        <div class="review-label">🎧 推荐场景</div>
-                        <div class="review-text" id="reviewScene"></div>
-                    </div>
+                    <div class="review-body" id="reviewBody"></div>
                     <div class="review-section" id="similarSection" style="display: none;">
                         <div class="review-label">🎶 相似推荐</div>
                         <div class="review-similar" id="reviewSimilar"></div>
@@ -89,48 +75,43 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <div class="status-log" id="statusLog" aria-live="polite">
+        <div class="status-log-title">运行状态</div>
+        <div class="status-log-body" id="statusLogBody">
+            <div class="status-log-line">等待后端状态...</div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>设置</h2>
+                <h2>缓存乐评</h2>
                 <button class="btn-close" id="closeSettingsBtn">×</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>LLM 提供商</label>
-                    <select id="configProvider">
-                        <option value="openai">OpenAI</option>
-                        <option value="deepseek">DeepSeek</option>
-                        <option value="gemini">Gemini</option>
-                    </select>
+                <div class="cache-toolbar">
+                    <div class="cache-count" id="cacheCount">共 0 条</div>
+                    <input class="cache-search" id="cacheSearch" type="search" placeholder="搜索歌曲、歌手或专辑">
+                    <button class="cache-tool-btn" id="cacheRefreshBtn" type="button">刷新</button>
+                    <button class="cache-tool-btn danger" id="cacheClearBtn" type="button">清空</button>
                 </div>
-                <div class="form-group">
-                    <label>模型名称</label>
-                    <input type="text" id="configModel" placeholder="gpt-4o-mini">
-                </div>
-                <div class="form-group">
-                    <label>轮询间隔 (秒)</label>
-                    <input type="number" id="configInterval" min="1" max="60" value="2">
-                </div>
-                <div class="form-group">
-                    <label>Web 端口</label>
-                    <input type="number" id="configPort" min="1024" max="65535" value="8080">
+                <div class="cache-list" id="cacheList">
+                    <div class="cache-empty">正在加载缓存...</div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" id="cancelSettingsBtn">取消</button>
-                <button class="btn-apple" id="saveSettingsBtn">保存</button>
+                <button class="btn-secondary" id="cancelSettingsBtn">关闭</button>
             </div>
         </div>
     </div>
 
     <script src="/js/state.js"></script>
-    <script src="/js/api.js"></script>
+    <script src="/js/api.js?v=cache2"></script>
     <script src="/js/aurora.js?v=aurora2"></script>
-    <script src="/js/display.js?v=trackfix1"></script>
+    <script src="/js/display.js?v=albumonly1"></script>
     <script src="/js/skeleton.js"></script>
     <script src="/js/toast.js"></script>
-    <script src="/js/modal.js"></script>
-    <script src="/js/app.js?v=aurora2"></script>
+    <script src="/js/modal.js?v=cache2"></script>
+    <script src="/js/app.js?v=quote2"></script>
 </body>
 </html>

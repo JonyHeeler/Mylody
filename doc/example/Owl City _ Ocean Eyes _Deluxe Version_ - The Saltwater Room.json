@@ -1,0 +1,22 @@
+{
+  "id": 20,
+  "title": "The Saltwater Room",
+  "artist": "Owl City — Ocean Eyes (Deluxe Version)",
+  "album": "未知专辑",
+  "ai_model": "deepseek-v4-flash",
+  "created_at": "2026-05-29T16:02:29.582318",
+  "updated_at": "2026-05-29T16:02:36.033417",
+  "review": {
+    "summary": "像一场深夜海边的轻声告白，潮水与星光交织的迷幻梦游。",
+    "emotion": "怀旧、迷恋、孤独中的浪漫",
+    "background": "Adam Young 在制作《Ocean Eyes》时，正值他从明尼苏达州的地下室卧室走向世界的起点。这首《The Saltwater Room》原本收录于他早期的独立EP，后来被重新录制并放入专辑豪华版。歌曲邀请女声 Breanne Düren 对唱，营造出两个孤独灵魂在潮汐声中对望的意象。整首歌仿佛来自一个失眠的午夜，海浪声采样和轻柔的电子音效，像是少年在耳机里给自己搭建的避风港。",
+    "musicology": "制作上，Adam Young 以清脆的电子鼓点模拟海浪拍打的节奏感，合成器铺陈出暖黄色的氛围，像透过水族箱玻璃看到的灯光。人声处理成略带呼吸感的近麦克风录音，与 Breanne 的飘渺和声交织，像潮水进退。副歌部分引入跳动的贝斯线和清脆的铃铛音色，赋予歌曲一种轻盈的漂浮感。Bridge 处突然收窄为钢琴和简单音效，再缓缓放大，模拟从水下浮出水面换气的瞬间。整体声音设计服务于梦境与清醒边缘的情绪——既怀念又安心。",
+    "why_listen": "这首歌适合独自在深夜戴耳机听，你或许会发现它像一封未寄出的信，写给某个遥远的人或某个过去的自己。很多时候，孤独不是痛苦，而是自己与回忆之间的潮汐——涨潮时回忆涌来，退潮时留下细碎的贝壳。《The Saltwater Room》就是那片沙滩，让你赤脚走上去，感受凉意与温柔。",
+    "similar_songs": [
+      "Fireflies - Owl City",
+      "Hello Seattle - Owl City",
+      "Strawberry Swing - Coldplay"
+    ],
+    "rating": 8.7
+  }
+}

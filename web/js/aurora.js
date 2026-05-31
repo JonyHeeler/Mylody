@@ -1,6 +1,6 @@
 /**
  * Aurora 背景控制器
- * 管理 Aurora 渐变背景的三种状态：idle（纯色）、active（流动）、frozen（冻结）
+ * 管理 Aurora 渐变背景的三种状态：idle（静止）、active（流动）、frozen（冻结）
  */
 
 const AuroraController = {
@@ -80,7 +80,7 @@ const AuroraController = {
     },
 
     /**
-     * 重置为静态纯色背景
+     * 重置为静态 Aurora 背景
      */
     reset() {
         const el = this._getElement();

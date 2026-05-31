@@ -31,11 +31,8 @@ def cache_manager(tmp_db_path):
 def sample_review():
     """创建示例乐评数据"""
     return ReviewData(
-        summary="一首充满活力的流行摇滚",
+        content="Counting Stars 像一通深夜电话，在焦虑和希望之间摇摆。",
         emotion="积极向上",
-        background="OneRepublic 美国流行摇滚乐队",
-        musicology="4/4拍，大调，节奏明快",
-        why_listen="旋律朗朗上口，歌词励志",
         similar_songs=["Apologize - OneRepublic"],
         rating=8.5,
     )
@@ -50,7 +47,7 @@ def test_put_and_get_basic(cache_manager, sample_review):
 
     cached = cache_manager.get("OneRepublic", "Counting Stars")
     assert cached is not None
-    assert cached.summary == sample_review.summary
+    assert cached.content == sample_review.content
     assert cached.rating == sample_review.rating
     assert cached.similar_songs == sample_review.similar_songs
 
@@ -64,7 +61,7 @@ def test_cache_hit_no_ai_call(cache_manager, sample_review):
 
     assert first is not None
     assert second is not None
-    assert first.summary == second.summary
+    assert first.content == second.content
 
 
 def test_cache_miss(cache_manager):
@@ -77,12 +74,12 @@ def test_cache_overwrite(cache_manager, sample_review):
     """测试缓存覆盖写入"""
     cache_manager.put("Artist", "Title", "Album", sample_review)
 
-    updated = ReviewData(summary="更新后的乐评", rating=9.0)
+    updated = ReviewData(content="更新后的乐评", rating=9.0)
     cache_manager.put("Artist", "Title", "Album", updated)
 
     cached = cache_manager.get("Artist", "Title")
     assert cached is not None
-    assert cached.summary == "更新后的乐评"
+    assert cached.content == "更新后的乐评"
     assert cached.rating == 9.0
 
 
@@ -121,7 +118,7 @@ def test_cache_expired(tmp_path):
     db_path = str(tmp_path / "expired_test.db")
     manager = CacheManager(db_path=db_path, cache_ttl_days=1)
 
-    review = ReviewData(summary="测试", rating=5.0)
+    review = ReviewData(content="测试乐评", rating=5.0)
     manager.put("Artist", "Title", "Album", review)
 
     manager._db.conn.execute(
@@ -141,7 +138,7 @@ def test_cache_no_expire_with_ttl_zero(tmp_path):
     db_path = str(tmp_path / "no_expire_test.db")
     manager = CacheManager(db_path=db_path, cache_ttl_days=0)
 
-    review = ReviewData(summary="永不过期", rating=5.0)
+    review = ReviewData(content="永不过期的乐评", rating=5.0)
     manager.put("Artist", "Title", "Album", review)
 
     manager._db.conn.execute(
@@ -152,7 +149,7 @@ def test_cache_no_expire_with_ttl_zero(tmp_path):
 
     cached = manager.get("Artist", "Title")
     assert cached is not None
-    assert cached.summary == "永不过期"
+    assert cached.content == "永不过期的乐评"
 
     manager.close()
 
@@ -164,13 +161,13 @@ def test_database_corruption_recovery(tmp_path):
 
     manager = CacheManager(db_path=str(db_path), cache_ttl_days=0)
 
-    review = ReviewData(summary="恢复后写入", rating=5.0)
+    review = ReviewData(content="恢复后写入", rating=5.0)
     result = manager.put("Artist", "Title", "Album", review)
     assert result is True
 
     cached = manager.get("Artist", "Title")
     assert cached is not None
-    assert cached.summary == "恢复后写入"
+    assert cached.content == "恢复后写入"
 
     backup_files = list(tmp_path.glob("corrupt_test_corrupted_*.db"))
     assert len(backup_files) == 1
@@ -184,7 +181,7 @@ def test_case_insensitive_key(cache_manager, sample_review):
 
     cached = cache_manager.get("onerepublic", "counting stars")
     assert cached is not None
-    assert cached.summary == sample_review.summary
+    assert cached.content == sample_review.content
 
 
 def test_deserialize_review(cache_manager, sample_review):
@@ -193,10 +190,65 @@ def test_deserialize_review(cache_manager, sample_review):
 
     cached = cache_manager.get("Artist", "Title")
     assert cached is not None
-    assert cached.summary == sample_review.summary
+    assert cached.content == sample_review.content
     assert cached.emotion == sample_review.emotion
-    assert cached.background == sample_review.background
-    assert cached.musicology == sample_review.musicology
-    assert cached.why_listen == sample_review.why_listen
     assert cached.similar_songs == sample_review.similar_songs
     assert cached.rating == sample_review.rating
+
+
+def test_schema_version_mismatch(tmp_path):
+    """测试 schema 版本不匹配时可兼容读取"""
+    db_path = str(tmp_path / "schema_test.db")
+    manager = CacheManager(db_path=db_path, cache_ttl_days=0)
+
+    review = ReviewData(content="旧版本乐评", rating=5.0)
+    manager.put("Artist", "Title", "Album", review)
+
+    manager._db.conn.execute(
+        """UPDATE reviews SET review_json = ? WHERE cache_key = ?""",
+        (json.dumps({
+            "content": "旧版本乐评",
+            "rating": 5.0,
+            "schema_version": "review_v1",
+        }), "artist::title"),
+    )
+    manager._db.conn.commit()
+
+    cached = manager.get("Artist", "Title")
+    assert cached is not None
+    assert cached.schema_version == "review_v2"
+
+    manager.close()
+
+
+def test_schema_version_missing(tmp_path):
+    """测试缺少 schema_version 时可兼容读取"""
+    db_path = str(tmp_path / "no_version_test.db")
+    manager = CacheManager(db_path=db_path, cache_ttl_days=0)
+
+    review = ReviewData(content="无版本乐评", rating=5.0)
+    manager.put("Artist", "Title", "Album", review)
+
+    manager._db.conn.execute(
+        """UPDATE reviews SET review_json = ? WHERE cache_key = ?""",
+        (json.dumps({
+            "content": "无版本乐评",
+            "rating": 5.0,
+        }), "artist::title"),
+    )
+    manager._db.conn.commit()
+
+    cached = manager.get("Artist", "Title")
+    assert cached is not None
+    assert cached.schema_version == "review_v2"
+
+    manager.close()
+
+
+def test_schema_version_match(cache_manager, sample_review):
+    """测试 schema 版本匹配时正常返回"""
+    cache_manager.put("Artist", "Title", "Album", sample_review)
+
+    cached = cache_manager.get("Artist", "Title")
+    assert cached is not None
+    assert cached.schema_version == "review_v2"

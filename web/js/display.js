@@ -54,9 +54,20 @@ const Display = {
 
         this.setText('trackTitle', track.title || '未知歌曲');
         this.setText('trackArtist', track.artist || '未知艺术家');
-        this.setText('trackAlbum', track.album || '');
+        this.setText('trackAlbum', this._formatTrackMeta(track));
         this.setText('trackStatus', AppState.getStatusText(track.playback_status));
         this.setText('sourceApp', `来源: ${track.source_app || '--'}`);
+    },
+
+    _formatTrackMeta(track) {
+        return track.album && track.album !== '未知专辑' ? track.album : '';
+    },
+
+    _formatDuration(ms) {
+        const total = Math.round(ms / 1000);
+        const minutes = Math.floor(total / 60);
+        const seconds = String(total % 60).padStart(2, '0');
+        return `${minutes}:${seconds}`;
     },
 
     /**
@@ -81,12 +92,21 @@ const Display = {
         }
 
         this.setText('reviewEmotion', review.emotion || '');
-        this.setText('reviewSummary', review.summary || '');
-        this.setText('reviewTheory', review.musicology || review.theory || '');
-        this.setText('reviewBackground', review.background || '');
-        this.setText('reviewScene', review.why_listen || review.scene || '');
+        this.setText('reviewQuote', review.quote || this._fallbackQuote(review));
+
+        const bodyEl = document.getElementById('reviewBody');
+        if (bodyEl) {
+            const text = review.content || review.summary || '';
+            bodyEl.innerHTML = text.split('\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+        }
 
         this._updateSimilar(review.similar_songs || review.similar || []);
+    },
+
+    _fallbackQuote(review) {
+        const text = review.content || review.summary || '';
+        const match = text.match(/^.{8,80}?[。！？.!?]/);
+        return match ? match[0] : text.slice(0, 60);
     },
 
     /**
@@ -141,5 +161,35 @@ const Display = {
         AppState.isConnected = connected;
         const dot = document.getElementById('statusDot');
         if (dot) dot.classList.toggle('active', connected);
+    },
+
+    /**
+     * 更新右下角运行状态日志
+     * @param {Array<Object>} events - 后端状态事件
+     */
+    updateStatusLog(events, backendLines = []) {
+        const body = document.getElementById('statusLogBody');
+        if (!body) return;
+
+        const statusRows = Array.isArray(events)
+            ? events.slice(-12).map(item => {
+                const time = item.time || '--:--:--';
+                return `[状态 ${time}] ${item.message || ''}`;
+            })
+            : [];
+        const logRows = Array.isArray(backendLines)
+            ? backendLines.slice(-80)
+            : [];
+        const rows = statusRows.concat(logRows);
+
+        if (rows.length === 0) {
+            body.innerHTML = '<div class="status-log-line">等待后端状态...</div>';
+            return;
+        }
+
+        body.innerHTML = rows.map(line =>
+            `<div class="status-log-line">${line}</div>`
+        ).join('');
+        body.scrollTop = body.scrollHeight;
     },
 };

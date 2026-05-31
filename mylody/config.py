@@ -1,6 +1,5 @@
 """配置管理模块：加载、验证、提供 YAML 配置访问"""
 
-import shutil
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -8,41 +7,37 @@ from typing import Any, Optional
 import yaml
 
 from mylody.config_defaults import DEFAULT_CONFIG, get_example_config_path
-from mylody.utils.paths import get_config_path, get_mylody_dir
 
 
 class Config:
     """Mylody 配置管理器
 
-    负责从 ~/.mylody/config.yaml 加载配置，处理缺失字段和异常情况。
+    负责从当前工作目录 config.yaml 加载配置，处理缺失字段和异常情况。
 
     Args:
         config_path: 自定义配置文件路径，为 None 时使用默认路径
     """
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        self._path = Path(config_path) if config_path else get_config_path()
+        self._path = Path(config_path) if config_path else Path.cwd() / "config.yaml"
         self._data: dict = {}
         self._load()
 
     def _load(self) -> None:
-        """加载配置：确保目录存在，复制示例配置（如需），读取并合并默认值"""
-        self._ensure_config_dir()
+        """加载配置：确保配置文件存在，读取并合并默认值"""
         self._ensure_config_file()
         user_config = self._load_yaml(self._path)
         self._data = self._merge(DEFAULT_CONFIG, user_config)
-
-    def _ensure_config_dir(self) -> None:
-        """确保 ~/.mylody/ 目录存在"""
-        get_mylody_dir()
 
     def _ensure_config_file(self) -> None:
         """若 config.yaml 不存在，从 config.example.yaml 复制"""
         if self._path.exists():
             return
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         example = get_example_config_path()
         if example.exists():
-            shutil.copy2(example, self._path)
+            text = example.read_text(encoding="utf-8")
+            self._path.write_text(text, encoding="utf-8")
             print(f"[Mylody] 已创建配置文件: {self._path}")
             print("[Mylody] 请编辑配置文件，填写你的 API Key")
         else:
@@ -91,7 +86,7 @@ class Config:
         """获取配置值，支持点号分隔的嵌套键
 
         Args:
-            key: 配置键名，如 "ai.provider" 或 "listener.debounce_seconds"
+            key: 配置键名，如 "ai.model" 或 "listener.debounce_seconds"
             default: 键不存在时的默认值
 
         Returns:
@@ -114,11 +109,12 @@ class Config:
         """
         warnings = []
         api_key = self.get("ai.api_key", "")
-        if not api_key or api_key == "YOUR_API_KEY_HERE":
-            warnings.append("API Key 未配置，请编辑 ~/.mylody/config.yaml 填写有效的 API Key")
-        provider = self.get("ai.provider", "")
-        if provider not in ("anthropic", "openai", "custom"):
-            warnings.append(f"未知的 AI 提供商: {provider}，已回退到 anthropic")
+        if not api_key or api_key in ("YOUR_API_KEY_HERE", "YOUR_MIMO_API_KEY"):
+            warnings.append(f"API Key 未配置，请编辑 {self._path} 填写有效的 API Key")
+        if not self.get("ai.base_url", ""):
+            warnings.append("ai.base_url 未配置；DeepSeek 可使用 https://api.deepseek.com")
+        if not self.get("ai.model", ""):
+            warnings.append("ai.model 未配置")
         return warnings
 
     @property

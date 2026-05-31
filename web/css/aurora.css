@@ -2,7 +2,20 @@
     position: fixed;
     inset: 0;
     z-index: -1;
-    background-color: var(--bg-primary);
+    background: linear-gradient(
+        -45deg,
+        var(--aurora-1),
+        var(--aurora-2),
+        var(--aurora-3),
+        var(--aurora-4),
+        var(--aurora-5),
+        var(--aurora-6),
+        var(--aurora-7),
+        var(--aurora-8),
+        var(--aurora-1)
+    );
+    background-size: 800% 800%;
+    filter: saturate(1.02) contrast(1.01);
     transition: background-color 0.8s ease, filter 0.8s ease;
     overflow: hidden;
 }
@@ -47,7 +60,7 @@
     border-radius: 50%;
     mix-blend-mode: multiply;
     filter: blur(78px);
-    opacity: 0;
+    opacity: 0.42;
     transition: opacity 0.8s ease, transform 0.8s ease;
     pointer-events: none;
     will-change: transform, opacity;

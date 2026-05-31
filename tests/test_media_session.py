@@ -97,6 +97,125 @@ async def test_get_current_info_with_session(media_session):
 
 
 @pytest.mark.asyncio
+async def test_get_current_info_splits_apple_music_artist_album(media_session):
+    """测试 Apple Music 把 artist 写成 artist — album 时能拆分"""
+    mock_session = MagicMock()
+    mock_props = MagicMock()
+    mock_props.title = "All We Are"
+    mock_props.artist = "OneRepublic — Dreaming Out Loud (Deluxe)"
+    mock_props.album_title = ""
+    mock_props.album_artist = "OneRepublic"
+    mock_props.track_number = 7
+    mock_props.album_track_count = 16
+    mock_props.genres = ["Pop"]
+
+    mock_playback = MagicMock()
+    mock_playback.playback_status = 4
+    mock_timeline = MagicMock()
+    mock_timeline.end_time = 2450000000
+    mock_timeline.position = 300000000
+
+    mock_session.try_get_media_properties_async = AsyncMock(return_value=mock_props)
+    mock_session.get_playback_info.return_value = mock_playback
+    mock_session.get_timeline_properties.return_value = mock_timeline
+    mock_session.source_app_user_model_id = "AppleMusic"
+
+    media_session._initialized = True
+    media_session._manager = MagicMock()
+    media_session._manager.get_current_session.return_value = mock_session
+
+    result = await media_session.get_current_info()
+
+    assert result is not None
+    assert result.artist == "OneRepublic"
+    assert result.album == "Dreaming Out Loud (Deluxe)"
+    assert result.track_number == 7
+    assert result.album_track_count == 16
+    assert result.genres == ["Pop"]
+    assert result.duration_ms == 245000
+
+
+@pytest.mark.asyncio
+async def test_get_current_info_ignores_empty_title(media_session):
+    """测试获取信息 - 空标题不应被当作歌曲"""
+    mock_session = MagicMock()
+    mock_props = MagicMock()
+    mock_props.title = ""
+    mock_props.artist = ""
+    mock_props.album_title = ""
+    mock_props.album_artist = ""
+
+    mock_playback = MagicMock()
+    mock_playback.playback_status = 4
+
+    mock_session.try_get_media_properties_async = AsyncMock(return_value=mock_props)
+    mock_session.get_playback_info.return_value = mock_playback
+    mock_session.source_app_user_model_id = "TestApp"
+
+    media_session._initialized = True
+    media_session._manager = MagicMock()
+    media_session._manager.get_current_session.return_value = mock_session
+
+    result = await media_session.get_current_info()
+
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_get_current_info_allows_missing_artist(media_session):
+    """测试获取信息 - 标题有效时允许歌手缺失"""
+    mock_session = MagicMock()
+    mock_props = MagicMock()
+    mock_props.title = "Test Song"
+    mock_props.artist = ""
+    mock_props.album_title = "Test Album"
+    mock_props.album_artist = ""
+
+    mock_playback = MagicMock()
+    mock_playback.playback_status = 4
+
+    mock_session.try_get_media_properties_async = AsyncMock(return_value=mock_props)
+    mock_session.get_playback_info.return_value = mock_playback
+    mock_session.source_app_user_model_id = "TestApp"
+
+    media_session._initialized = True
+    media_session._manager = MagicMock()
+    media_session._manager.get_current_session.return_value = mock_session
+
+    result = await media_session.get_current_info()
+
+    assert result is not None
+    assert result.title == "Test Song"
+    assert result.artist == "未知艺术家"
+
+
+@pytest.mark.asyncio
+async def test_get_current_info_ignores_paused_media(media_session):
+    """测试获取信息 - 暂停状态不触发当前播放"""
+    mock_session = MagicMock()
+    mock_props = MagicMock()
+    mock_props.title = "Test Song"
+    mock_props.artist = "Test Artist"
+    mock_props.album_title = "Test Album"
+    mock_props.album_artist = "Test Album Artist"
+
+    mock_playback = MagicMock()
+    mock_playback.playback_status = 5
+
+    mock_session.try_get_media_properties_async = AsyncMock(return_value=mock_props)
+    mock_session.get_playback_info.return_value = mock_playback
+    mock_session.source_app_user_model_id = "TestApp"
+
+    media_session._initialized = True
+    media_session._manager = MagicMock()
+    media_session._manager.get_current_session.return_value = mock_session
+
+    result = await media_session.get_current_info()
+
+    assert result is None
+
+
+@pytest.mark.asyncio
 async def test_get_current_info_not_initialized(media_session):
     """测试获取信息 - 未初始化"""
     result = await media_session.get_current_info()

@@ -5,6 +5,7 @@
 
 const POLL_INTERVAL = 2000;
 let pollTimer = null;
+let backendLogLines = [];
 
 /**
  * 判断当前页面是否处于 Aurora 预览模式
@@ -22,6 +23,8 @@ async function poll() {
         const data = await API.fetchStatus();
         Display.setConnected(true);
         Display.updateUptime(data.uptime_seconds);
+        await loadBackendLogs();
+        Display.updateStatusLog(data.status_events, backendLogLines);
 
         if (!data.current_track) {
             Display.updateTrack(null);
@@ -56,13 +59,29 @@ async function poll() {
             if (AppState.auroraPhase === 'active') {
                 AuroraController.freeze();
             }
+            const quoteMissing = !document.getElementById('reviewQuote')?.textContent?.trim();
             if (isNewTrack || !document.getElementById('reviewContent')?.style.display ||
-                document.getElementById('reviewContent')?.style.display === 'none') {
+                document.getElementById('reviewContent')?.style.display === 'none' ||
+                quoteMissing) {
                 await loadReview();
             }
         }
     } catch {
         Display.setConnected(false);
+    }
+}
+
+/**
+ * 加载后端日志尾部内容
+ */
+async function loadBackendLogs() {
+    try {
+        const data = await API.fetchLogs();
+        backendLogLines = data.lines || [];
+    } catch {
+        backendLogLines = backendLogLines.length
+            ? backendLogLines
+            : ['后端日志读取失败'];
     }
 }
 
@@ -76,9 +95,15 @@ async function loadReview() {
             Skeleton.resetReview();
             Display.updateReview(review);
             Toast.show(review);
+        } else {
+            Skeleton.resetReview();
+            Display.hideReview();
+            AuroraController.reset();
         }
     } catch {
         Skeleton.resetReview();
+        Display.hideReview();
+        AuroraController.reset();
     }
 }
 
@@ -122,7 +147,6 @@ function bindEvents() {
     document.getElementById('settingsBtn')?.addEventListener('click', () => SettingsModal.open());
     document.getElementById('closeSettingsBtn')?.addEventListener('click', () => SettingsModal.close());
     document.getElementById('cancelSettingsBtn')?.addEventListener('click', () => SettingsModal.close());
-    document.getElementById('saveSettingsBtn')?.addEventListener('click', () => SettingsModal.save());
 
     document.getElementById('settingsModal')?.addEventListener('click', (e) => {
         if (e.target === e.currentTarget) SettingsModal.close();

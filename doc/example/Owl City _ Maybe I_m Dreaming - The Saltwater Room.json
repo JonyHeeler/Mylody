@@ -1,0 +1,22 @@
+{
+  "id": 23,
+  "title": "The Saltwater Room",
+  "artist": "Owl City — Maybe I'm Dreaming",
+  "album": "未知专辑",
+  "ai_model": "deepseek-v4-flash",
+  "created_at": "2026-05-29T16:05:26.135566",
+  "updated_at": "2026-05-29T16:05:26.135566",
+  "review": {
+    "summary": "深夜海边的孤独独白，潜入内心深处的潮湿幻想。",
+    "emotion": "怀旧、孤独、浪漫、幻想",
+    "background": "这首歌来自Owl City的第二张录音室专辑《Maybe I'm Dreaming》，发行于2008年，正是Adam Young从地下室卧室制作人转型为梦幻电子流行标杆的时期。整张专辑像一本半梦半醒的日记，而《The Saltwater Room》是其中最具画面感的一章——它诞生于Adam对海洋与距离的迷恋，歌词里写满潮汐、贝壳和搁浅的船，仿佛一场年少时未完成的约会，被裹进咸湿的海风里。",
+    "musicology": "制作上延续了Owl City标志性的卧室电子风格：清脆的模拟合成器琶音如月光洒在海面，点缀着海浪翻涌的环境采样；鼓机打出像心跳一样轻而稳的节奏，钢琴和弦在高处铺开一层薄雾。Adam的人声经过轻微压缩和混响处理，带着一种孩子气的透明感，与女声（Breanne Düren）的交缠像是两个灵魂隔着水波对话。Bridge部分，人声突然降低，合成器化作低鸣的潮声，推动情绪缓缓涨落，最后一切回落进一片空寂的底噪中，如同退潮后只剩沙滩上的足印。",
+    "why_listen": "我们都有过这样的时刻：在某个深夜，望着窗外的城市或一片漆黑的海，脑子里冒出许久未联系的人，想起那些没说出口的话。这首歌就是你耳机里的那片海——它不提供答案，只提供一个允许你暂时漂浮的空间。你或许会发现，孤独也可以如此温柔，像海水包裹住一颗石头，慢慢磨掉棱角。",
+    "similar_songs": [
+      "Vanilla Twilight - Owl City",
+      "Such Great Heights - The Postal Service",
+      "Night Drive - The American Dollar"
+    ],
+    "rating": 8.5
+  }
+}

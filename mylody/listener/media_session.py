@@ -7,6 +7,7 @@ from typing import Optional
 from mylody.types import MediaInfo
 
 logger = logging.getLogger("mylody.listener.media_session")
+ARTIST_ALBUM_SEPARATORS = (" — ", " – ", " - ")
 
 PLAYBACK_STATUS_MAP = {
     1: "stopped",
@@ -71,15 +72,29 @@ class MediaSessionManager:
             props = await session.try_get_media_properties_async()
             playback = session.get_playback_info()
             status_code = playback.playback_status
+            timeline = self._get_timeline(session)
 
-            title = props.title if props.title else "未知歌曲"
-            artist = props.artist if props.artist else "未知艺术家"
+            title = props.title.strip() if props.title else ""
+            artist = props.artist.strip() if props.artist else ""
+            album = props.album_title.strip() if props.album_title else ""
+            album_artist = props.album_artist.strip() if props.album_artist else ""
+            artist, album = self._split_artist_album(artist, album)
+            track_number = self._safe_int(getattr(props, "track_number", 0))
+            album_track_count = self._safe_int(getattr(props, "album_track_count", 0))
+            genres = self._safe_list(getattr(props, "genres", []))
+            if status_code != 4 or not title:
+                return None
 
             return MediaInfo(
                 title=title,
-                artist=artist,
-                album=props.album_title or "未知专辑",
-                album_artist=props.album_artist or "",
+                artist=artist or "未知艺术家",
+                album=album or "未知专辑",
+                album_artist=album_artist,
+                track_number=track_number,
+                album_track_count=album_track_count,
+                genres=genres,
+                duration_ms=self._timespan_to_ms(getattr(timeline, "end_time", None)),
+                position_ms=self._timespan_to_ms(getattr(timeline, "position", None)),
                 source_app=session.source_app_user_model_id or "",
                 playback_status=status_code,
                 timestamp=datetime.now(timezone.utc).isoformat(),
@@ -115,6 +130,8 @@ class MediaSessionManager:
         try:
             playback = session.get_playback_info()
             status_code = playback.playback_status
+            if status_code != 4:
+                return None
 
             return MediaInfo(
                 title="未知歌曲",
@@ -128,3 +145,49 @@ class MediaSessionManager:
         except Exception as e:
             logger.debug("窗口标题备用方案失败: %s", e)
             return None
+
+    @staticmethod
+    def _split_artist_album(artist: str, album: str) -> tuple[str, str]:
+        """Apple Music sometimes puts 'artist — album' in artist fields."""
+        if album and album != "未知专辑":
+            return artist, album
+
+        for separator in ARTIST_ALBUM_SEPARATORS:
+            if separator in artist:
+                left, right = artist.split(separator, 1)
+                if left.strip() and right.strip():
+                    return left.strip(), right.strip()
+
+        return artist, album
+
+    @staticmethod
+    def _get_timeline(session):
+        try:
+            return session.get_timeline_properties()
+        except Exception:
+            return None
+
+    @staticmethod
+    def _safe_int(value) -> int:
+        try:
+            return int(value or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    @staticmethod
+    def _safe_list(value) -> list[str]:
+        try:
+            return [str(item).strip() for item in value if str(item).strip()]
+        except TypeError:
+            return []
+
+    @staticmethod
+    def _timespan_to_ms(value) -> int:
+        if value is None:
+            return 0
+        if hasattr(value, "total_seconds"):
+            return int(value.total_seconds() * 1000)
+        try:
+            return int(value) // 10_000
+        except (TypeError, ValueError):
+            return 0

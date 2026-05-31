@@ -1,0 +1,22 @@
+{
+  "id": 25,
+  "title": "Silhouette",
+  "artist": "Owl City — The Midsummer Station",
+  "album": "未知专辑",
+  "ai_model": "deepseek-v4-flash",
+  "created_at": "2026-05-29T16:21:07.963075",
+  "updated_at": "2026-05-29T16:21:07.963075",
+  "review": {
+    "summary": "冬夜窗霜上的孤影，回忆模糊的轮廓",
+    "emotion": "怀旧、孤独、失落、自我凝视",
+    "background": "2012年，Owl City 在《The Midsummer Station》中尝试了更明亮、更流行的方向，但专辑里也藏着几首沉郁的内省之作。Silhouette 便是其中之一，诞生于巡演结束后的空窗期——当灯光熄灭、掌声消散，生活中的那个人也早已离开，只剩下一个逐渐模糊的剪影。Adam Young 用这首歌捕捉了那种无法重来的失落：不是剧烈的痛苦，而是像旧照片褪色一样缓慢的遗忘。",
+    "musicology": "制作上，这首歌一反 Owl City 标志性的电子糖衣，以钢琴和弦乐冷冽开场，像清晨未散的雾。人声压得很低，带着气声的脆弱感，几乎像在自言自语。鼓点被抑制在背景中，只有在副歌时才稍微抬起，而电子脉冲（synth pad）像微弱的信号在耳边闪烁。Bridge 部分弦乐层层叠高，但很快又退去，如同试图抓住的回忆却从指缝溜走。整首歌曲的声音设计服务于“剪影”的意象：模糊、边缘柔和、不可触碰。",
+    "why_listen": "很多时候，我们以为自己会永远记住某个人的脸，可随着时间冲刷，最后留下的不过是一道模糊的剪影。这首歌就是为这样的时刻而写——当你深夜翻看旧照片，发现已经想不起对方的眼睛是什么颜色时，它不会责备你的健忘，而是静静告诉你：剪影也是一种存在形式，足够让我们怀念。",
+    "similar_songs": [
+      "The Saltwater Room - Owl City",
+      "Bloom - The Paper Kites",
+      "Fourth of July - Sufjan Stevens"
+    ],
+    "rating": 8.0
+  }
+}

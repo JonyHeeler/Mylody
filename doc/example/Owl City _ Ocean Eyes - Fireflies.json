@@ -1,0 +1,22 @@
+{
+  "id": 27,
+  "title": "Fireflies",
+  "artist": "Owl City — Ocean Eyes",
+  "album": "未知专辑",
+  "ai_model": "deepseek-v4-flash",
+  "created_at": "2026-05-29T16:25:04.639426",
+  "updated_at": "2026-05-29T16:25:04.639426",
+  "review": {
+    "summary": "像童年夏夜跌入一场温柔的电子萤火雨",
+    "emotion": "怀旧、治愈、梦幻、孤独中的安宁",
+    "background": "2009年，明尼苏达的卧室音乐人Adam Young正用简陋设备对抗失眠与孤独。他把自己关在地下室，用一台旧合成器和盗版的FL Studio录制出一首关于萤火虫的碎碎念。《Fireflies》原本只是MySpace上的一首小样，却意外成为2009年全球现象级热单，让这个从未真正见过萤火虫的宅男，用声音为无数人编制了一个可躺进去的童年梦乡。",
+    "musicology": "制作上，Adam Young刻意保留低保真质感的电鼓loop，像心跳般左声道轻叩；合成器音色选用明亮而含混的8-bit式琶音，模拟萤火虫忽明忽暗的生物钟。人声处理成极近距离的耳语混响，仿佛趴在你枕边念日记。副歌处突然加入的弦乐采样与电子铃铛，制造出一种触手可及却无法握住的光点升腾感。整首歌没有鼓点高潮递进，只有不断循环的温暖loop，像一种安全的晕眩。",
+    "why_listen": "你或许早已不是相信萤火虫会说话的年纪，但深夜打开播放器，这首没有副歌爆点的歌仍能让你瞬间安静下来。它像一床用电子信号织成的毛毯，盖住白天所有解释不清的疲惫。很多时候我们怀念的并非童年本身，而是那种不需要理由就能被微小光芒感动的能力。",
+    "similar_songs": [
+      "Vanilla Twilight - Owl City",
+      "The Saltwater Room - Owl City",
+      "Strawberry Avalanche - Owl City"
+    ],
+    "rating": 8.7
+  }
+}

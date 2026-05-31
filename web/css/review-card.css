@@ -25,6 +25,15 @@
     animation: fadeIn 0.4s ease;
 }
 
+.review-quote {
+    margin-bottom: 18px;
+    font-size: clamp(20px, 4vw, 28px);
+    line-height: 1.35;
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
 .review-header {
     display: flex;
     align-items: center;
@@ -55,6 +64,21 @@
 
 .review-section {
     margin-bottom: 20px;
+}
+
+.review-body {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.review-body p {
+    margin-bottom: 16px;
+}
+
+.review-body p:last-child {
+    margin-bottom: 0;
 }
 
 .review-label {

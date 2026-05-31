@@ -5,11 +5,10 @@ from pathlib import Path
 
 DEFAULT_CONFIG: dict = {
     "ai": {
-        "provider": "anthropic",
         "api_key": "YOUR_API_KEY_HERE",
-        "model": "claude-sonnet-4-20250514",
-        "base_url": "",
-        "timeout_seconds": 15,
+        "model": "deepseek-chat",
+        "base_url": "https://api.deepseek.com",
+        "timeout_seconds": 30,
         "max_retries": 2,
     },
     "cache": {

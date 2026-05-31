@@ -129,6 +129,79 @@ async def test_listener_no_media(mock_config, mock_media_session):
 
 
 @pytest.mark.asyncio
+async def test_listener_clears_track_when_media_stops(mock_config, mock_media_session):
+    """测试已有曲目停止后通知上层清空状态"""
+    callback = AsyncMock()
+    clear_callback = AsyncMock()
+    track_info = MediaInfo(
+        title="Test Song",
+        artist="Test Artist",
+        source_app="Spotify.exe",
+        playback_status=4,
+    )
+
+    mock_media_session.get_current_info.side_effect = [track_info, track_info, None, None]
+    mock_media_session.is_excluded.return_value = False
+
+    listener = MediaListener(mock_config, callback, on_track_clear=clear_callback)
+
+    await listener.start()
+    await asyncio.sleep(0.5)
+    await listener.stop()
+
+    callback.assert_called_once_with(track_info)
+    clear_callback.assert_called_once()
+    assert listener.current_track is None
+
+
+@pytest.mark.asyncio
+async def test_listener_ignores_invalid_unknown_track(mock_config, mock_media_session):
+    """测试未知占位曲目不触发乐评"""
+    callback = AsyncMock()
+    track_info = MediaInfo(
+        title="未知歌曲",
+        artist="未知艺术家",
+        source_app="Spotify.exe",
+        playback_status=4,
+    )
+
+    mock_media_session.get_current_info.return_value = track_info
+    mock_media_session.is_excluded.return_value = False
+
+    listener = MediaListener(mock_config, callback)
+
+    await listener.start()
+    await asyncio.sleep(0.3)
+    await listener.stop()
+
+    callback.assert_not_called()
+    assert listener.current_track is None
+
+
+@pytest.mark.asyncio
+async def test_listener_allows_known_title_with_unknown_artist(mock_config, mock_media_session):
+    """测试标题有效时允许歌手缺失"""
+    callback = AsyncMock()
+    track_info = MediaInfo(
+        title="Test Song",
+        artist="未知艺术家",
+        source_app="Spotify.exe",
+        playback_status=4,
+    )
+
+    mock_media_session.get_current_info.return_value = track_info
+    mock_media_session.is_excluded.return_value = False
+
+    listener = MediaListener(mock_config, callback)
+
+    await listener.start()
+    await asyncio.sleep(0.3)
+    await listener.stop()
+
+    callback.assert_called_once_with(track_info)
+
+
+@pytest.mark.asyncio
 async def test_listener_current_track_property(mock_config, mock_media_session):
     """测试 current_track 属性"""
     callback = AsyncMock()

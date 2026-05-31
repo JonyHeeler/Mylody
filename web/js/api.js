@@ -22,7 +22,10 @@ const API = {
         const res = await fetch('/api/review/current');
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
-        return data.review || data;
+        if (data.status && data.status !== 'ok') {
+            throw new Error(data.message || '获取乐评失败');
+        }
+        return data.review || null;
     },
 
     /**
@@ -33,7 +36,10 @@ const API = {
         const res = await fetch('/api/review/refresh', { method: 'POST' });
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
-        return data.review || data;
+        if (data.status && data.status !== 'ok') {
+            throw new Error(data.message || '刷新乐评失败');
+        }
+        return data.review || null;
     },
 
     /**
@@ -47,17 +53,56 @@ const API = {
     },
 
     /**
-     * 保存配置
-     * @param {Object} config - 配置对象
-     * @returns {Promise<Object>} 保存结果
+     * 获取后端日志尾部内容
+     * @returns {Promise<Object>} 日志数据
      */
-    async saveConfig(config) {
-        const res = await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(config),
-        });
+    async fetchLogs() {
+        const res = await fetch('/api/logs?lines=120');
         if (!res.ok) throw new Error(res.statusText);
         return res.json();
     },
+
+    /**
+     * 获取缓存乐评列表
+     * @returns {Promise<Array<Object>>} 缓存项列表
+     */
+    async fetchCachedReviews() {
+        const res = await fetch('/api/cache/reviews');
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        if (data.status && data.status !== 'ok') {
+            throw new Error(data.message || '获取缓存失败');
+        }
+        return data.items || [];
+    },
+
+    /**
+     * 删除指定缓存乐评
+     * @param {string} cacheKey - 缓存键
+     */
+    async deleteCachedReview(cacheKey) {
+        const res = await fetch(`/api/cache/reviews/${encodeURIComponent(cacheKey)}`, {
+            method: 'DELETE',
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        if (data.status && data.status !== 'ok') {
+            throw new Error(data.message || '删除缓存失败');
+        }
+        return data;
+    },
+
+    /**
+     * 清空全部缓存乐评
+     */
+    async clearCachedReviews() {
+        const res = await fetch('/api/cache/reviews', { method: 'DELETE' });
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        if (data.status && data.status !== 'ok') {
+            throw new Error(data.message || '清空缓存失败');
+        }
+        return data;
+    },
+
 };
