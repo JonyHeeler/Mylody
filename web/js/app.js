@@ -140,6 +140,14 @@ async function refreshReview() {
 }
 
 /**
+ * 切换运行状态日志的展开/收起
+ */
+function toggleStatusLog() {
+    const el = document.getElementById('statusLog');
+    if (el) el.classList.toggle('collapsed');
+}
+
+/**
  * 绑定所有 DOM 事件
  */
 function bindEvents() {
@@ -152,6 +160,8 @@ function bindEvents() {
     document.getElementById('cancelSettingsBtn')?.addEventListener('click', () => SettingsModal.close());
     document.getElementById('closeDetailBtn')?.addEventListener('click', () => DetailModal.close());
     document.getElementById('cancelDetailBtn')?.addEventListener('click', () => DetailModal.close());
+
+    document.getElementById('statusLogToggle')?.addEventListener('click', toggleStatusLog);
 
     document.getElementById('personalityModal')?.addEventListener('click', (e) => {
         if (e.target === e.currentTarget) PersonalityModal.close();

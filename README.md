@@ -6,23 +6,23 @@
 
 > I'm a mirrorball and I'll show you every version of yourself tonight.
 
-Mylody 是一个音乐乐评 AI Agent。它通过监听当前播放的歌曲，调用大语言模型生成一篇乐评，进而追踪你的音乐人格。
+Mylody 是一个音乐乐评 AI Agent。它监听当前播放的歌曲，调用大语言模型生成一篇乐评，进而帮助了解你的音乐喜好、音乐人格。
 
 灵感来源：[Melory](https://apps.apple.com/cn/app/id6756657818)
 
-本项目为 2025-2026-2 学期《AI 智能体产品设计》课程地 13 周作业。如有建议欢迎给我发邮件，联系方式在主页。
+本项目为 2025-2026-2 学期《AI 智能体产品设计》课程第 13 周作业。
 
 ## 功能
 
-- **自动监听** — 通过 Windows SMTC API 实时检测当前播放的歌曲，支持 Spotify、网易云音乐、Apple Music、Windows Media Player 等主流播放器
-- **AI 乐评生成** — 调用 OpenAI 兼容接口生成文乐评，包含情绪金句、评分、相似推荐
+- **自动监听** — 通过 Windows SMTC API 实时检测当前播放的歌曲
+- **AI 乐评生成** — 调用 OpenAI 兼容接口生成乐评，包含评分与相似推荐
 - **反幻觉机制** — 基于 MusicBrainz 音乐元数据和 Wikipedia 背景资料构建证据包，对无证据的高风险事实断言和歌词主题断言进行自动拦截
 - **本地缓存** — SQLite 存储，同一首歌只请求一次 AI，后续直接读取缓存，支持 TTL 过期策略
 - **音乐人格** — 基于历史乐评时间线，AI 生成你的「镜像音乐人生」分析，包括音乐人格画像、情绪模式、声音偏好等
 
 ## 快速开始
 
-### 1. 创建虚拟环境
+### 1. 创建虚拟环境（建议）
 
 ```bash
 py -3.11 -m venv .venv
@@ -37,16 +37,14 @@ pip install -r requirements.txt
 
 ### 3. 配置 API Key
 
-首次运行会自动从 `config.example.yaml` 复制生成项目根目录下的 `config.yaml`，编辑填写你的 API Key：
+首次运行会自动从 `config.example.yaml` 复制生成项目根目录下的 `config.yaml`，在这里填写你的 API Key：
 
 ```yaml
 ai:
   api_key: "YOUR_API_KEY"              # 填写你的 API Key
-  model: "deepseek-chat"               # 模型名称
-  base_url: "https://api.deepseek.com" # OpenAI 兼容接口地址
+  model: "gpt-5.5"                     # 模型名称
+  base_url: "https://api.OpenAI.com"   # OpenAI 兼容接口地址
 ```
-
-支持任何 OpenAI 兼容接口，例如 DeepSeek、通义千问、Moonshot 等。
 
 ### 4. 启动
 
