@@ -1,4 +1,8 @@
-# Mylody：镜像音乐人生
+# Mylody：音乐折射出生命的每一面
+
+<p align="center">
+  <img src="img/logo.png" alt="Mylody Logo" width="128">
+</p>
 
 > I'm a mirrorball and I'll show you every version of yourself tonight.
 
