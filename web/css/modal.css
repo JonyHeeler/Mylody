@@ -173,6 +173,11 @@
 
 .cache-item-main {
     min-width: 0;
+    cursor: pointer;
+}
+
+.cache-item-main:hover .cache-item-title {
+    color: var(--accent);
 }
 
 .cache-item-title {
@@ -219,6 +224,119 @@
 .cache-delete-btn:hover {
     color: var(--score-low);
     border-color: var(--score-low);
+}
+
+.personality-modal {
+    max-width: 720px;
+}
+
+.personality-meta {
+    margin-bottom: 14px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.personality-content {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.85;
+    word-break: break-word;
+}
+
+.personality-content h2,
+.personality-content h3,
+.personality-content h4 {
+    margin: 18px 0 8px;
+    color: var(--text-primary);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.personality-content h2:first-child,
+.personality-content h3:first-child,
+.personality-content h4:first-child {
+    margin-top: 0;
+}
+
+.personality-content h2 {
+    font-size: 18px;
+}
+
+.personality-content h3 {
+    font-size: 16px;
+}
+
+.personality-content h4 {
+    font-size: 15px;
+}
+
+.personality-content p {
+    margin: 0 0 12px;
+}
+
+.personality-content ul {
+    margin: 0 0 12px 18px;
+    padding: 0;
+}
+
+.personality-content li {
+    margin-bottom: 6px;
+}
+
+.personality-content strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.personality-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.personality-history-item {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: left;
+    cursor: pointer;
+}
+
+.personality-history-item:hover {
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+.personality-history-date {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.personality-history-excerpt {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted);
+    word-break: break-word;
+}
+
+.detail-modal {
+    max-width: 760px;
+}
+
+.detail-content {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 @media (max-width: 560px) {

@@ -7,8 +7,9 @@ import re
 from typing import Optional
 
 from mylody.ai.guardrails import validate_and_extract, validate_review
-from mylody.ai.prompt import SYSTEM_PROMPT, build_user_prompt
 from mylody.ai.provider_base import BaseProvider
+from mylody.ai.prompts.repair import REPAIR_PROMPT_SUFFIX
+from mylody.ai.prompts.review import SYSTEM_PROMPT, build_user_prompt
 from mylody.config import Config
 from mylody.types import MediaInfo, ReviewData
 
@@ -19,14 +20,6 @@ ERROR_MESSAGES = {
     429: "API 请求频率超限，请稍后重试",
     500: "AI 服务不可用，请稍后重试",
 }
-
-REPAIR_PROMPT_SUFFIX = """
-
-你上次返回的 JSON 未通过校验，请修正以下问题后重新返回：
-{errors}
-
-请确保返回符合要求的 JSON 格式。"""
-
 
 class AIClient:
     """AI 乐评生成客户端
@@ -107,6 +100,28 @@ class AIClient:
         return await asyncio.wait_for(
             self._provider.chat(system_prompt, user_prompt),
             timeout=self._timeout,
+        )
+
+    async def generate_text(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        timeout_seconds: Optional[int] = None,
+    ) -> str:
+        """调用 Provider 生成普通文本。
+
+        Args:
+            system_prompt: 系统提示词
+            user_prompt: 用户提示词
+            timeout_seconds: 可选超时时间；为空时使用默认 AI 超时
+
+        Returns:
+            str: 模型返回的原始文本
+        """
+        timeout = timeout_seconds or self._timeout
+        return await asyncio.wait_for(
+            self._provider.chat(system_prompt, user_prompt),
+            timeout=timeout,
         )
 
     async def _retry_repair(

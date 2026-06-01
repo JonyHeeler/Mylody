@@ -148,6 +148,21 @@ async def list_cached_reviews(request: Request) -> dict:
     return {"status": "ok", "items": cache_manager.list_reviews()}
 
 
+@router.get("/api/cache/reviews/{cache_key:path}")
+async def get_cached_review(cache_key: str, request: Request) -> dict:
+    """读取指定缓存乐评全文。"""
+    cache_manager = getattr(request.app.state, "cache_manager", None)
+
+    if cache_manager is None:
+        return {"status": "error", "message": "缓存未初始化"}
+
+    item = cache_manager.get_by_key(cache_key)
+    if item is None:
+        return {"status": "error", "message": "缓存不存在"}
+
+    return {"status": "ok", "item": item}
+
+
 @router.delete("/api/cache/reviews")
 async def clear_cached_reviews(request: Request) -> dict:
     """清空全部缓存乐评。"""

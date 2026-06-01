@@ -26,6 +26,19 @@ CREATE_INDEX_SQL = """
 CREATE INDEX IF NOT EXISTS idx_reviews_cache_key ON reviews (cache_key);
 """
 
+CREATE_PERSONALITIES_SQL = """
+CREATE TABLE IF NOT EXISTS personalities (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    content     TEXT NOT NULL,
+    item_count  INTEGER NOT NULL,
+    ai_model    TEXT,
+    created_at  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_personalities_created_at
+ON personalities (created_at);
+"""
+
 
 class Database:
     """SQLite 数据库连接管理器
@@ -75,7 +88,7 @@ class Database:
 
     def _ensure_table(self) -> None:
         """确保 reviews 表和索引存在"""
-        self.conn.executescript(CREATE_TABLE_SQL + CREATE_INDEX_SQL)
+        self.conn.executescript(CREATE_TABLE_SQL + CREATE_INDEX_SQL + CREATE_PERSONALITIES_SQL)
 
     def _recover_from_corruption(self) -> None:
         """数据库损坏时备份旧文件并重建空数据库"""

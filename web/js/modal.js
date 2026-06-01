@@ -97,6 +97,7 @@ const SettingsModal = {
             details.textContent = `评分 ${rating} · ${item.emotion || '无情绪标签'} · ${item.updated_at || ''}`;
 
             meta.append(title, sub, excerpt, details);
+            meta.addEventListener('click', () => this.openReviewDetail(item.cache_key));
 
             const actions = document.createElement('div');
             actions.className = 'cache-item-actions';
@@ -143,6 +144,24 @@ const SettingsModal = {
             await loadReview();
         } catch (err) {
             console.error('删除缓存失败:', err);
+        }
+    },
+
+    async openReviewDetail(cacheKey) {
+        if (!cacheKey) return;
+        try {
+            const item = await API.fetchCachedReview(cacheKey);
+            const review = item.review || {};
+            const title = `${item.title || '未知歌曲'} - ${item.artist || '未知艺术家'}`;
+            const body = [
+                review.quote ? `「${review.quote}」` : '',
+                review.content || '',
+                review.emotion ? `情绪：${review.emotion}` : '',
+                review.similar_songs?.length ? `相似推荐：${review.similar_songs.join(' / ')}` : '',
+            ].filter(Boolean).join('\n\n');
+            DetailModal.open(title, body);
+        } catch (err) {
+            console.error('读取乐评详情失败:', err);
         }
     },
 

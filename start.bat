@@ -6,6 +6,7 @@ set "PORT=5800"
 set "HOST=127.0.0.1"
 set "PYTHON=%ROOT%.venv\Scripts\python.exe"
 set "URL=http://%HOST%:%PORT%"
+set "OPEN_URL=%URL%/?v=%RANDOM%%RANDOM%"
 
 if not exist "%PYTHON%" (
   echo [Mylody] Python runtime not found: %PYTHON%
@@ -32,7 +33,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo [Mylody] Opening %URL% ...
-start "" "%URL%"
+echo [Mylody] Opening %OPEN_URL% ...
+start "" "%OPEN_URL%"
 
 endlocal

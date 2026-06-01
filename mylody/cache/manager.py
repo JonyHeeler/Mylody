@@ -182,6 +182,40 @@ class CacheManager:
             logger.error("缓存删除失败: %s - %s", cache_key, e)
             return False
 
+    def get_by_key(self, cache_key: str) -> Optional[dict]:
+        """按缓存键读取完整乐评。"""
+        try:
+            row = self._db.conn.execute(
+                """SELECT cache_key, title, artist, album, review_json, ai_model,
+                          created_at, updated_at
+                   FROM reviews
+                   WHERE cache_key = ?""",
+                (cache_key,),
+            ).fetchone()
+        except Exception as e:
+            logger.error("缓存详情读取失败: %s", e)
+            return None
+
+        if row is None:
+            return None
+
+        cache_key, title, artist, album, review_json, model, created_at, updated_at = row
+        review = self._deserialize_review(review_json)
+        try:
+            fallback = normalize_review_payload(json.loads(review_json))
+        except (json.JSONDecodeError, TypeError):
+            fallback = {}
+        return {
+            "cache_key": cache_key,
+            "title": title,
+            "artist": artist or "",
+            "album": album or "",
+            "model": model or "",
+            "created_at": created_at,
+            "updated_at": updated_at,
+            "review": review.to_dict() if review else fallback,
+        }
+
     def clear(self) -> int:
         """清空全部缓存，返回删除条数。"""
         try:

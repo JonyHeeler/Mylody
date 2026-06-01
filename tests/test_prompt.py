@@ -1,6 +1,11 @@
 """Prompt 模板单元测试"""
 
 from mylody.ai.prompt import SYSTEM_PROMPT, build_user_prompt
+from mylody.ai.prompts.personality import (
+    SYSTEM_PROMPT as PERSONALITY_SYSTEM_PROMPT,
+    build_user_prompt as build_personality_user_prompt,
+)
+from mylody.ai.personality import strip_personality_title
 from mylody.types import MediaInfo
 
 
@@ -159,3 +164,43 @@ def test_system_prompt_excludes_web_search_rules():
     assert "联网搜索结果" not in SYSTEM_PROMPT
     assert "搜索结果仅供参考" not in SYSTEM_PROMPT
     assert "据媒体报道" not in SYSTEM_PROMPT
+
+
+def test_build_personality_prompt_with_journey_items():
+    """测试音乐人格 Prompt 包含乐评时间线和生成时间"""
+    prompt = build_personality_user_prompt([
+        {
+            "title": "Nude",
+            "artist": "Radiohead",
+            "generated_at": "2026-06-01T12:00:00",
+            "review": "一段关于失重感的乐评",
+        }
+    ])
+
+    assert "音乐人格" in PERSONALITY_SYSTEM_PROMPT
+    assert "乐评时间线" in prompt
+    assert "Nude" in prompt
+    assert "2026-06-01T12:00:00" in prompt
+
+
+def test_personality_prompt_keeps_journey_payload_compact():
+    """测试音乐人格 Prompt 可接收压缩后的时间线"""
+    prompt = build_personality_user_prompt([
+        {
+            "title": "Long Song",
+            "artist": "Long Artist",
+            "generated_at": "2026-06-01T12:00:00",
+            "emotion": "怀旧",
+            "review": "听感片段" * 40,
+        }
+    ])
+
+    assert "Long Song" in prompt
+    assert "听感片段" in prompt
+
+
+def test_strip_personality_title_removes_outer_yearbook_title():
+    """测试音乐人格会移除外层年报标题。"""
+    content = "# 你的 2026 年夏季音乐人格年报\n\n## 夜航型共情者\n\n正文"
+
+    assert strip_personality_title(content).startswith("## 夜航型共情者")

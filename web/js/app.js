@@ -144,12 +144,25 @@ async function refreshReview() {
  */
 function bindEvents() {
     document.getElementById('refreshBtn')?.addEventListener('click', refreshReview);
+    document.getElementById('personalityBtn')?.addEventListener('click', () => PersonalityModal.open());
     document.getElementById('settingsBtn')?.addEventListener('click', () => SettingsModal.open());
+    document.getElementById('closePersonalityBtn')?.addEventListener('click', () => PersonalityModal.close());
+    document.getElementById('cancelPersonalityBtn')?.addEventListener('click', () => PersonalityModal.close());
     document.getElementById('closeSettingsBtn')?.addEventListener('click', () => SettingsModal.close());
     document.getElementById('cancelSettingsBtn')?.addEventListener('click', () => SettingsModal.close());
+    document.getElementById('closeDetailBtn')?.addEventListener('click', () => DetailModal.close());
+    document.getElementById('cancelDetailBtn')?.addEventListener('click', () => DetailModal.close());
+
+    document.getElementById('personalityModal')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) PersonalityModal.close();
+    });
 
     document.getElementById('settingsModal')?.addEventListener('click', (e) => {
         if (e.target === e.currentTarget) SettingsModal.close();
+    });
+
+    document.getElementById('detailModal')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) DetailModal.close();
     });
 }
 

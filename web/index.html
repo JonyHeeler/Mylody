@@ -31,6 +31,7 @@
                 <span>Mylody</span>
             </div>
             <div class="header-actions">
+                <button class="btn-icon" id="personalityBtn" title="音乐人格">🧭</button>
                 <button class="btn-icon" id="settingsBtn" title="设置">⚙️</button>
                 <span class="status-dot" id="statusDot"></span>
             </div>
@@ -105,13 +106,49 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="personalityModal">
+        <div class="modal personality-modal">
+            <div class="modal-header">
+                <h2>音乐人格</h2>
+                <button class="btn-close" id="closePersonalityBtn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="personality-meta" id="personalityMeta">准备生成...</div>
+                <div class="personality-content" id="personalityContent"></div>
+                <div class="personality-history" id="personalityHistoryList"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="regeneratePersonalityBtn">重新生成</button>
+                <button class="btn-secondary" id="cancelPersonalityBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal detail-modal">
+            <div class="modal-header">
+                <h2 id="detailTitle">详情</h2>
+                <button class="btn-close" id="closeDetailBtn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-content" id="detailContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelDetailBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/state.js"></script>
-    <script src="/js/api.js?v=cache2"></script>
+    <script src="/js/api.js?v=personality1"></script>
     <script src="/js/aurora.js?v=aurora2"></script>
     <script src="/js/display.js?v=albumonly1"></script>
     <script src="/js/skeleton.js"></script>
     <script src="/js/toast.js"></script>
+    <script src="/js/markdown.js?v=personality1"></script>
+    <script src="/js/detail-modal.js?v=detail1"></script>
     <script src="/js/modal.js?v=cache2"></script>
-    <script src="/js/app.js?v=quote2"></script>
+    <script src="/js/personality-modal.js?v=personality2"></script>
+    <script src="/js/app.js?v=personality2"></script>
 </body>
 </html>
