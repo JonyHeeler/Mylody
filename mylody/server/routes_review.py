@@ -3,6 +3,8 @@
 import logging
 
 from fastapi import APIRouter, Request
+from mylody.evidence.bundle_formatter import format_ai_evidence
+from mylody.evidence.types import EvidenceBundle
 from mylody.server.status_log import add_status
 
 logger = logging.getLogger("mylody.server.review")
@@ -20,29 +22,39 @@ async def _fetch_evidence_bundle(request: Request, track_info) -> dict:
         results = await evidence_service.search_recordings(
             track_info.title, track_info.artist, limit=3
         )
-        if not results:
-            return {"confidence": 0.0}
-
-        best = results[0]
-        metadata = await evidence_service.get_recording_metadata(best.recording_mbid)
-        if metadata is None:
-            return {"confidence": 0.0}
-
-        bundle = evidence_service.build_evidence(
-            track_info.title,
-            track_info.artist,
-            track_info.album,
-            metadata,
-            search_score=best.score,
+        bundle = EvidenceBundle(
+            track_title=track_info.title,
+            artist=track_info.artist,
+            album=track_info.album,
         )
-        return {
-            "known_facts": [fact.value for fact in bundle.known_facts],
-            "uncertain_facts": [fact.value for fact in bundle.uncertain_facts],
-            "confidence": bundle.confidence,
-            "sources": [source.to_dict() for source in bundle.sources],
-        }
+        if results:
+            best = results[0]
+            metadata = await evidence_service.get_recording_metadata(best.recording_mbid)
+            if metadata is not None:
+                bundle = evidence_service.build_evidence(
+                    track_info.title,
+                    track_info.artist,
+                    track_info.album,
+                    metadata,
+                    search_score=best.score,
+                )
+            else:
+                add_status(request.app, '"MusicBrainz" 未启用或不可用，已跳过')
+        else:
+            add_status(request.app, '"MusicBrainz" 未启用或不可用，已跳过')
+
+        wikipedia_context = await evidence_service.search_wikipedia_music_context(
+            track_info.title, track_info.artist, track_info.album
+        )
+        if wikipedia_context is None:
+            add_status(request.app, '"Wikipedia" 未启用或不可用，已跳过')
+        return format_ai_evidence(
+            bundle,
+            wikipedia_context=wikipedia_context,
+        )
     except Exception as e:
         logger.warning("刷新乐评获取 MusicBrainz 证据失败: %s", e)
+        add_status(request.app, '"外部证据" 未启用或不可用，已跳过')
         return {"confidence": 0.0}
 
 

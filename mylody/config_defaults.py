@@ -35,6 +35,9 @@ DEFAULT_CONFIG: dict = {
         "host": "127.0.0.1",
         "port": 5800,
     },
+    "evidence": {
+        "wikipedia_language": "en",
+    },
 }
 
 CONFIG_DIR_NAME = ".mylody"

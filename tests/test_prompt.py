@@ -86,8 +86,22 @@ def test_system_prompt_contains_safety_rules():
 
 def test_system_prompt_requests_longer_review():
     """测试系统 Prompt 要求更长乐评"""
-    assert "900-1200" in SYSTEM_PROMPT
+    assert "900-1500" in SYSTEM_PROMPT
     assert "金句" in SYSTEM_PROMPT
+
+
+def test_system_prompt_contains_story_review_style():
+    """测试 System Prompt 包含故事化乐评风格"""
+    assert "故事化中文乐评" in SYSTEM_PROMPT
+    assert "声音 -> 情绪" in SYSTEM_PROMPT
+    assert "普通音乐爱好者" in SYSTEM_PROMPT
+
+
+def test_system_prompt_blocks_unsupported_theme_claims():
+    """测试 System Prompt 禁止无证据歌词主题判断"""
+    assert "无证据断言歌词主题" in SYSTEM_PROMPT
+    assert "这是情歌" in SYSTEM_PROMPT
+    assert "写给前任" in SYSTEM_PROMPT
 
 
 def test_build_user_prompt_with_musicbrainz_evidence():
@@ -104,6 +118,21 @@ def test_build_user_prompt_with_musicbrainz_evidence():
     assert "未确认信息" in prompt
     assert "可能在伦敦录制" in prompt
     assert "Counting Stars" in prompt
+
+
+def test_build_user_prompt_with_wikipedia_evidence():
+    """测试 Wikipedia evidence 会进入 Prompt"""
+    track = MediaInfo(title="Nude", artist="Radiohead", album="In Rainbows")
+    evidence = {
+        "known_facts": [
+            "[wikipedia] artist_background: Radiohead are an English rock band.",
+        ],
+        "uncertain_facts": [],
+    }
+    prompt = build_user_prompt(track, evidence)
+
+    assert "外部已确认事实" in prompt
+    assert "Radiohead are an English rock band" in prompt
 
 
 def test_build_user_prompt_with_empty_legacy_evidence():

@@ -32,6 +32,25 @@ HIGH_RISK_PATTERNS = [
 
 HIGH_RISK_RE = re.compile("|".join(HIGH_RISK_PATTERNS), re.IGNORECASE)
 
+THEME_CLAIM_PATTERNS = [
+    r"这[是一首]*.*情歌",
+    r"这[是一首]*.*分手歌",
+    r"这[是一首]*.*复仇",
+    r"写给前任",
+    r"写给恋人",
+    r"写给爱人",
+    r"讲述.*分手",
+    r"讲述.*爱情",
+    r"讲述.*暗恋",
+    r"关于.*背叛",
+    r"关于.*失恋",
+    r"歌词.*讲",
+    r"歌词.*写",
+    r"副歌.*唱",
+]
+
+THEME_CLAIM_RE = re.compile("|".join(THEME_CLAIM_PATTERNS), re.IGNORECASE)
+
 
 def normalize_review_payload(data: dict) -> dict:
     """兼容旧版或模型偏离格式的乐评字段"""
@@ -133,6 +152,7 @@ def validate_review(data: dict) -> ValidationResult:
     _check_types(data, result)
     _check_values(data, result)
     _check_high_risk_content(data, result)
+    _check_unsupported_theme_claims(data, result)
 
     return result
 
@@ -219,6 +239,23 @@ def _check_high_risk_content(data: dict, result: ValidationResult) -> None:
 
     if matches:
         result.add_error(f"检测到无证据的高风险事实断言: {', '.join(set(matches))}")
+
+
+def _check_unsupported_theme_claims(data: dict, result: ValidationResult) -> None:
+    """检查无证据时的歌词主题断言。"""
+    analysis_basis = data.get("analysis_basis", "track_metadata")
+    known_facts = data.get("known_facts", [])
+
+    if analysis_basis == "external_evidence" and known_facts:
+        return
+
+    content = data.get("content", "")
+    matches = THEME_CLAIM_RE.findall(content)
+
+    if matches:
+        result.add_error(
+            f"检测到无证据的歌词主题断言: {', '.join(set(matches))}"
+        )
 
 
 def _first_sentence(text: str) -> str:

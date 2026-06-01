@@ -41,3 +41,7 @@ logging:
 server:
   host: "127.0.0.1"
   port: 5800
+
+# --- 证据增强配置 ---
+evidence:
+  wikipedia_language: "en"      # Wikipedia 语言版本，如 en / zh

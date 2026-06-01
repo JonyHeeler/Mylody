@@ -10,7 +10,9 @@ import uvicorn
 
 from mylody.cache import CacheManager
 from mylody.config import Config
+from mylody.evidence.bundle_formatter import format_ai_evidence
 from mylody.evidence.service import EvidenceService
+from mylody.evidence.types import EvidenceBundle
 from mylody.logger import setup_logger
 from mylody.server.app import create_app
 from mylody.server.status_log import add_status
@@ -62,7 +64,9 @@ def main() -> None:
     cache_ttl_days = config.get("cache.cache_ttl_days", 0)
     cache_manager = CacheManager(db_path=db_path, cache_ttl_days=cache_ttl_days)
     logger.info("缓存已初始化: %s (TTL: %d 天)", db_path, cache_ttl_days)
-    evidence_service = EvidenceService()
+    evidence_service = EvidenceService(
+        wikipedia_language=config.get("evidence.wikipedia_language", "en"),
+    )
     logger.info("MusicBrainz Evidence 服务已初始化")
 
     app = create_app()
@@ -129,29 +133,41 @@ def main() -> None:
             results = await evidence_service.search_recordings(
                 info.title, info.artist, limit=3
             )
-            if not results:
-                return {"confidence": 0.0}
-
-            best = results[0]
-            metadata = await evidence_service.get_recording_metadata(best.recording_mbid)
-            if metadata is None:
-                return {"confidence": 0.0}
-
-            bundle = evidence_service.build_evidence(
-                info.title,
-                info.artist,
-                info.album,
-                metadata,
-                search_score=best.score,
+            bundle = EvidenceBundle(
+                track_title=info.title,
+                artist=info.artist,
+                album=info.album,
             )
-            return {
-                "known_facts": [fact.value for fact in bundle.known_facts],
-                "uncertain_facts": [fact.value for fact in bundle.uncertain_facts],
-                "confidence": bundle.confidence,
-                "sources": [source.to_dict() for source in bundle.sources],
-            }
+            if results:
+                best = results[0]
+                metadata = await evidence_service.get_recording_metadata(
+                    best.recording_mbid
+                )
+                if metadata is not None:
+                    bundle = evidence_service.build_evidence(
+                        info.title,
+                        info.artist,
+                        info.album,
+                        metadata,
+                        search_score=best.score,
+                    )
+                else:
+                    add_status(app, '"MusicBrainz" 未启用或不可用，已跳过')
+            else:
+                add_status(app, '"MusicBrainz" 未启用或不可用，已跳过')
+
+            wikipedia_context = await evidence_service.search_wikipedia_music_context(
+                info.title, info.artist, info.album
+            )
+            if wikipedia_context is None:
+                add_status(app, '"Wikipedia" 未启用或不可用，已跳过')
+            return format_ai_evidence(
+                bundle,
+                wikipedia_context=wikipedia_context,
+            )
         except Exception as e:
             logger.warning("MusicBrainz 证据获取失败: %s", e)
+            add_status(app, '"外部证据" 未启用或不可用，已跳过')
             return {"confidence": 0.0}
 
     def on_track_clear() -> None:

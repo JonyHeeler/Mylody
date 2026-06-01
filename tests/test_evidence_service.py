@@ -11,6 +11,7 @@ from mylody.evidence.types import (
     MusicSearchResult,
     ReleaseInfo,
 )
+from mylody.evidence.external_types import ArtistBackground
 
 
 @pytest.fixture
@@ -219,6 +220,52 @@ async def test_get_recording_metadata(mock_service, sample_metadata):
     assert metadata is not None
     assert metadata.recording_mbid == "test-mbid-123"
     assert metadata.title == "Nude"
+
+
+@pytest.mark.asyncio
+async def test_get_recording_metadata_enriches_release(mock_service):
+    """测试 Recording 详情会补充 Release 厂牌信息"""
+    mock_service._client.get = AsyncMock(side_effect=[
+        {
+            "id": "test-mbid-123",
+            "title": "Nude",
+            "artist-credit": [
+                {"artist": {"id": "artist-mbid", "name": "Radiohead"}}
+            ],
+            "releases": [{"id": "release-mbid", "title": "In Rainbows"}],
+            "isrcs": [],
+            "genres": [],
+            "tags": [],
+            "relations": [],
+        },
+        {
+            "id": "release-mbid",
+            "title": "In Rainbows",
+            "date": "2007-10-10",
+            "country": "GB",
+            "status": "Official",
+            "barcode": "634904032428",
+            "label-info": [{"label": {"name": "XL Recordings"}}],
+        },
+    ])
+    mock_service._client.get_cover_art = AsyncMock(return_value=None)
+
+    metadata = await mock_service.get_recording_metadata("test-mbid-123")
+
+    assert metadata is not None
+    assert metadata.releases[0].date == "2007-10-10"
+    assert metadata.releases[0].label_names == ["XL Recordings"]
+
+
+@pytest.mark.asyncio
+async def test_search_wikipedia_artist_delegates(mock_service):
+    """测试 Wikipedia 艺术家资料代理"""
+    background = ArtistBackground(artist="Radiohead", title="Radiohead")
+    mock_service._external.search_wikipedia_artist = AsyncMock(return_value=background)
+
+    result = await mock_service.search_wikipedia_artist("Radiohead")
+
+    assert result == background
 
 
 @pytest.mark.asyncio

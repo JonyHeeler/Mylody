@@ -71,3 +71,36 @@ async def get_recording_metadata(request: Request, mbid: str) -> dict:
         "status": "ok",
         "metadata": metadata.to_dict(),
     }
+
+
+@router.get("/api/music/artist/wikipedia")
+async def search_wikipedia_artist(
+    request: Request,
+    artist: str = Query(..., min_length=1, description="艺术家名称"),
+) -> dict:
+    """Search Wikipedia artist background."""
+    service = _get_evidence_service(request)
+    background = await service.search_wikipedia_artist(artist)
+
+    return {
+        "status": "ok",
+        "background": background.to_dict() if background else None,
+    }
+
+
+@router.get("/api/music/wikipedia/context")
+async def search_wikipedia_music_context(
+    request: Request,
+    title: str = Query(..., min_length=1, description="歌曲标题"),
+    artist: str = Query("", description="艺术家名称"),
+    album: str = Query("", description="专辑或发行标题"),
+) -> dict:
+    """Search precise Wikipedia context for song, release and artist."""
+    service = _get_evidence_service(request)
+    context = await service.search_wikipedia_music_context(title, artist, album)
+
+    return {
+        "status": "ok",
+        "context": context.to_dict() if context else None,
+    }
+

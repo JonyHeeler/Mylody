@@ -12,16 +12,21 @@ from mylody.config_defaults import DEFAULT_CONFIG, get_example_config_path
 class Config:
     """Mylody 配置管理器
 
-    负责从当前工作目录 config.yaml 加载配置，处理缺失字段和异常情况。
+    负责从项目根目录 config.yaml 加载配置，处理缺失字段和异常情况。
 
     Args:
         config_path: 自定义配置文件路径，为 None 时使用默认路径
     """
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        self._path = Path(config_path) if config_path else Path.cwd() / "config.yaml"
+        self._path = Path(config_path) if config_path else self._default_config_path()
         self._data: dict = {}
         self._load()
+
+    @staticmethod
+    def _default_config_path() -> Path:
+        """Return the config.yaml path in the project root."""
+        return Path(__file__).parent.parent / "config.yaml"
 
     def _load(self) -> None:
         """加载配置：确保配置文件存在，读取并合并默认值"""

@@ -15,12 +15,12 @@ def get_mylody_dir() -> Path:
 
 
 def get_config_path() -> Path:
-    """获取 config.yaml 文件路径
+    """获取项目根目录 config.yaml 文件路径
 
     Returns:
         Path: 配置文件完整路径
     """
-    return get_mylody_dir() / "config.yaml"
+    return Path(__file__).parent.parent.parent / "config.yaml"
 
 
 def get_cache_dir() -> Path:

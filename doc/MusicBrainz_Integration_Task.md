@@ -812,7 +812,7 @@ GET /api/music/recording/00000000-0000-0000-0000-000000000000
 
 * 接入 ListenBrainz 获取听歌趋势和用户维度数据
 * 接入 AcousticBrainz 替代数据源或本地音频特征分析
-* 接入 Genius / Musixmatch 等歌词来源，但要注意授权
+* 接入授权歌词来源时需确认版权与 API 使用边界
 * 做多数据源交叉验证，进一步降低 AI 乐评幻觉
 * 为每条 AI 乐评保留 metadata snapshot，方便追溯事实来源
 

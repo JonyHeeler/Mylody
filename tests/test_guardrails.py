@@ -119,6 +119,18 @@ def test_validate_high_risk_content_without_evidence():
     assert any("高风险" in e for e in result.errors)
 
 
+def test_validate_theme_claim_without_evidence():
+    """测试无证据时的歌词主题断言（应报错）"""
+    data = _make_valid_data()
+    data["content"] = "这是一首情歌，歌词讲述了恋人之间的分手与复合。"
+    data["analysis_basis"] = "track_metadata"
+    data["known_facts"] = []
+    result = validate_review(data)
+
+    assert result.valid is False
+    assert any("歌词主题断言" in e for e in result.errors)
+
+
 def test_validate_high_risk_content_with_evidence():
     """测试有证据时允许高风险内容"""
     data = _make_valid_data()

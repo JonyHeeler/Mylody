@@ -7,10 +7,16 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional, Union
 
 from mylody.evidence.client import MusicBrainzClient, NotFoundError
+from mylody.evidence.external_service import ExternalEvidenceService
+from mylody.evidence.external_types import (
+    ArtistBackground,
+    WikipediaMusicContext,
+)
 from mylody.evidence.mapper import (
     map_cover_art,
     map_recording_detail,
     map_recording_search_result,
+    map_release,
 )
 from mylody.evidence.types import (
     EvidenceBundle,
@@ -37,8 +43,14 @@ class EvidenceService:
         _recording_cache: Recording 详情缓存
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        wikipedia_language: str = "en",
+    ) -> None:
         self._client = MusicBrainzClient()
+        self._external = ExternalEvidenceService(
+            wikipedia_language=wikipedia_language,
+        )
         self._search_cache: dict[str, tuple[list[MusicSearchResult], datetime]] = {}
         self._recording_cache: dict[str, tuple[MusicMetadata, datetime]] = {}
 
@@ -125,18 +137,51 @@ class EvidenceService:
         metadata = map_recording_detail(data)
 
         for release in metadata.releases[:3]:
+            if not release.mbid:
+                continue
             try:
+                release_data = await self._client.get(
+                    f"/release/{release.mbid}",
+                    params={"inc": "artist-credits+labels+release-groups+genres+tags"},
+                )
+                enriched_release = map_release(release_data)
+                release.date = release.date or enriched_release.date
+                release.country = release.country or enriched_release.country
+                release.status = release.status or enriched_release.status
+                release.barcode = release.barcode or enriched_release.barcode
+                release.label_names = release.label_names or enriched_release.label_names
                 cover_data = await self._client.get_cover_art(release.mbid)
                 if cover_data:
                     release.cover_art = map_cover_art(cover_data)
             except Exception as e:
-                logger.debug("获取封面失败: %s - %s", release.mbid, e)
+                logger.debug("获取 Release 增强信息失败: %s - %s", release.mbid, e)
 
         self._set_to_cache(
             self._recording_cache, recording_mbid, metadata, RECORDING_CACHE_TTL
         )
 
         return metadata
+
+    async def search_wikipedia_artist(
+        self, artist: str
+    ) -> Optional[ArtistBackground]:
+        """Search Wikipedia for artist background.
+
+        Args:
+            artist: Artist name.
+
+        Returns:
+            ArtistBackground if a likely page is found, otherwise None.
+        """
+        return await self._external.search_wikipedia_artist(artist)
+
+    async def search_wikipedia_music_context(
+        self, title: str, artist: str = "", album: str = ""
+    ) -> Optional[WikipediaMusicContext]:
+        """Search Wikipedia for song, release and artist context."""
+        return await self._external.search_wikipedia_music_context(
+            title, artist, album
+        )
 
     def build_evidence(
         self,
@@ -371,3 +416,4 @@ class EvidenceService:
     async def close(self) -> None:
         """关闭服务"""
         await self._client.close()
+        await self._external.close()
